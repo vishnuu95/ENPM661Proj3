@@ -126,7 +126,7 @@ def define_map(clear_r):  # makes the map according to the assignment
 
     point1 = [95*trsh,30*trsh]
     point2 = [(95+10*np.sin(np.deg2rad(30)))*trsh,(30+10*np.cos(np.deg2rad(30)))*trsh]
-    point3 = [(point2[0]-75*np.cos(np.deg2rad(30)))*trsh,(point2[1]+75*np.sin(np.deg2rad(30)))*trsh]
+    point3 = [point2[0]-(75*np.cos(np.deg2rad(30)))*trsh,point2[1]+(75*np.sin(np.deg2rad(30)))*trsh]
     point4 = [(95-75*np.cos(np.deg2rad(30)))*trsh,(30+75*np.sin(np.deg2rad(30)))*trsh]
     a.triangle_obstacle((point3,point1,point2))
     a.triangle_obstacle((point4,point3,point1))
@@ -234,8 +234,8 @@ def find_children(curr_node):
 def add_image_frame(curr_node): # A function to add the newly explored state to a frame. This would also update the color based on the cost to come
     global img, vidWriter
     img[curr_node.loc[0], curr_node.loc[1],0:3] = [0,255,np.min([50 + curr_node.value*2, 255]) ]
-    cv2.imshow('LaureKaBaal',img)
-    cv2.waitKey(0)
+    #cv2.imshow('LaureKaBaal',img)
+    #cv2.waitKey(0)
     vidWriter.write(cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE))
     return
     
