@@ -107,26 +107,27 @@ def max_and_min(point_list):
 
 def define_map(clear_r):  # makes the map according to the assignment
     global a
-    a = MapMake(300, 200)
-    a.circle_obstacle(225, 150, 25)
-    a.oval_obstacle(150,100,40,20)
+    trsh = 2
+    a = MapMake(300*trsh, 200*trsh)
+    a.circle_obstacle(225*trsh, 150*trsh, 25*trsh)
+    a.oval_obstacle(150*trsh,100*trsh,40*trsh,20*trsh)
 
-    a.triangle_obstacle(([20,120],[25,185],[50,150]))
-    a.triangle_obstacle(([50,150],[25,185],[75,185]))
-    a.triangle_obstacle(([50,150],[75,185],[100,150]))
-    a.triangle_obstacle(([50,150],[100,150],[75,120]))
+    a.triangle_obstacle(([20*trsh,120*trsh],[25*trsh,185*trsh],[50*trsh,150*trsh]))
+    a.triangle_obstacle(([50*trsh,150*trsh],[25*trsh,185*trsh],[75*trsh,185*trsh]))
+    a.triangle_obstacle(([50*trsh,150*trsh],[75*trsh,185*trsh],[100*trsh,150*trsh]))
+    a.triangle_obstacle(([50*trsh,150*trsh],[100*trsh,150*trsh],[75*trsh,120*trsh]))
 
-    a.triangle_obstacle(([25,185],[50,150],[75,185]))
-    a.triangle_obstacle(([75,185],[100,150],[50,150]))
-    a.triangle_obstacle(([50,150],[100,150],[75,120]))
+    a.triangle_obstacle(([25*trsh,185*trsh],[50*trsh,150*trsh],[75*trsh,185*trsh]))
+    a.triangle_obstacle(([75*trsh,185*trsh],[100*trsh,150*trsh],[50*trsh,150*trsh]))
+    a.triangle_obstacle(([50*trsh,150*trsh],[100*trsh,150*trsh],[75*trsh,120*trsh]))
 
-    a.triangle_obstacle(([225,10],[225,40],[250,25]))
-    a.triangle_obstacle(([225,10],[225,40],[200,25]))
+    a.triangle_obstacle(([225*trsh,10*trsh],[225*trsh,40*trsh],[250*trsh,25*trsh]))
+    a.triangle_obstacle(([225*trsh,10*trsh],[225*trsh,40*trsh],[200*trsh,25*trsh]))
 
-    point1 = [95,30]
-    point2 = [95+10*np.sin(np.deg2rad(30)),30+10*np.cos(np.deg2rad(30))]
-    point3 = [point2[0]-75*np.cos(np.deg2rad(30)),point2[1]+75*np.sin(np.deg2rad(30))]
-    point4 = [95-75*np.cos(np.deg2rad(30)),30+75*np.sin(np.deg2rad(30))]
+    point1 = [95*trsh,30*trsh]
+    point2 = [(95+10*np.sin(np.deg2rad(30)))*trsh,(30+10*np.cos(np.deg2rad(30)))*trsh]
+    point3 = [(point2[0]-75*np.cos(np.deg2rad(30)))*trsh,(point2[1]+75*np.sin(np.deg2rad(30)))*trsh]
+    point4 = [(95-75*np.cos(np.deg2rad(30)))*trsh,(30+75*np.sin(np.deg2rad(30)))*trsh]
     a.triangle_obstacle((point3,point1,point2))
     a.triangle_obstacle((point4,point3,point1))
 
@@ -233,6 +234,8 @@ def find_children(curr_node):
 def add_image_frame(curr_node): # A function to add the newly explored state to a frame. This would also update the color based on the cost to come
     global img, vidWriter
     img[curr_node.loc[0], curr_node.loc[1],0:3] = [0,255,np.min([50 + curr_node.value*2, 255]) ]
+    cv2.imshow('LaureKaBaal',img)
+    cv2.waitKey(0)
     vidWriter.write(cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE))
     return
     
@@ -265,7 +268,7 @@ if __name__=="__main__":
     final_path = []
     visitedNode = {}
     vidWriter = cv2.VideoWriter("Djikstra.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 288, (300,200))
-    img = np.zeros([300,200,3], dtype=np.uint8)
+    img = np.zeros([300*2,200*2,3], dtype=np.uint8)
     img[:,:,0:3] = [0,255,0]
     bot_r = int(input("Enter robot radius: "))
     clear_r = int(input("Enter the clearance: "))
