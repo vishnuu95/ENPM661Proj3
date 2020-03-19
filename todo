@@ -1,0 +1,38 @@
+1. using user input of step size: create global variable for this 
+
+threshold: Create new map. scale all the points of the map obstacles, start point, end point. 
+ # Abhishek
+2. Change the reached goal function
+based on goal threshold. 
+
+# abhishek
+
+
+3. Change the add frame function
+thetaink about this
+
+
+
+4. Change the Cost function
+# abhishek
+
+
+5. Add theta dimension in the map 
+# vishnuu 
+14 elements in 3rd dimension
+
+
+6. incorporate theta in cost function
+# abhishek
+
+7. draw a vector 
+# vishnuu
+
+8. remove dictionary and update map itself to have info of visited nodes. 
+# Abhishek
+
+9. Change the children find to incorporate angle also
+# abhishek
+
+10. Change the node class to have angles information as well 
+# Vishnuu
