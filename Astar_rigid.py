@@ -199,10 +199,10 @@ def allowable_check(points):
                                         (round(point[0]+step_size*np.cos(np.deg2rad(theta))),round(point[1]+step_size*np.sin(np.deg2rad(theta)))),\
                                         (round(point[0]+step_size*np.cos(np.deg2rad(2*theta))),round(point[1]+step_size*np.sin(np.deg2rad(2*theta))))
     
-    test_square_moves = list((itop,it_right,iright,ib_right,ibottom))
-    actual_square_moves = list((top,t_right,right,b_right,bottom))
+    test_moves = list((itop,it_right,iright,ib_right,ibottom))
+    actual_moves = list((top,t_right,right,b_right,bottom))
     allowable_actions = []
-    for move,amove in test_square_moves,actual_square_moves:
+    for move,amove in test_moves,actual_moves:
         if a.map[move[0],move[1],int(move[2]/30)]==0:  #check if visited
             if a.map.shape[0]>move[0] >=0:              #check if on map X
                 if a.map.shape[1] > move[1] >= 0:       #check if on map Y
@@ -237,15 +237,15 @@ def find_path(curr_node): # A function to find the path until the root by tracki
 def find_children(curr_node):
     test_node = curr_node
 
-    sqr_child_loc = allowable_moves(curr_node.loc)  # gets allowable cardinal moves
-    go_cost = math.sqrt((curr_node[0]-end_pt[0])**2 + (curr_node[1]-end_pt[1])**2)
-    sqr_child_cost = test_node.value + step_size + go_cost           # square move cost
-    sqr_children_list = []
-    for state_loc in sqr_child_loc:
-        if a.map[state_loc[0]][state_loc[1]][1] > sqr_child_cost:  # if the child cost is less from the current node
-            a.map[state_loc[0]][state_loc[1]][1] = sqr_child_cost  # update map node to lesser cost
-            sqr_child_node = node(state_loc,curr_node)              # create new child node
-            sqr_children_list.append((sqr_child_node.value, sqr_child_node.counter, sqr_child_node))
+    child_loc = allowable_check(curr_node.loc)  # gets allowable cardinal moves
+    go_cost = math.sqrt((curr_node.loc[0]-end_pt[0])**2 + (curr_node.loc[1]-end_pt[1])**2)
+    child_cost = test_node.value + step_size + go_cost           # square move cost
+    children_list = []
+    for state_loc in child_loc:
+        if a.map[state_loc[0]][state_loc[1]][13] > child_cost:  # if the child cost is less from the current node
+            a.map[state_loc[0]][state_loc[1]][13] = child_cost  # update map node to lesser cost
+            child_node = node(state_loc,curr_node)              # create new child node
+            children_list.append((child_node.value, child_node.counter, child_node))
     '''
     dia_child_loc = allowable_moves(curr_node.loc)[1]  # gets allowable diagonal moves
     dia_child_cost = test_node.value + np.sqrt(2)      # diagonal moves cost
@@ -256,7 +256,6 @@ def find_children(curr_node):
             dia_child_node = node(state_loc, curr_node)            # create new child node
             dia_children_list.append((dia_child_node.value, dia_child_node.counter, dia_child_node))
     '''
-    children_list = sqr_children_list
     return children_list  # list of all children with a lesser cost for the current node
 
 
@@ -284,6 +283,8 @@ def solver(curr_node):  # A function to be recursively called to find the djikst
         add_image_frame(curr_node)
         children_list = find_children(curr_node) # a function to find possible children and update cost
         l = l + children_list                  # adding possible children to the list
+        if (l = []):
+            return 0
         heapq.heapify(l)                    # converting to a list
         curr_node = heapq.heappop(l)[2]            # recursive call to solver where we pass the element with the least cost 
     return 1        
@@ -328,7 +329,7 @@ if __name__=="__main__":
         if len(end_pt.split()) < 3 :
             end_pt = [int(end_pt.split()[0]), int(end_pt.split()[1]), 0]
         else:
-            end_pt = [int(end_pt.split())[0], int(end_pt.split())[1], int(end_pt.split())[2]]    
+            end_pt = [int(end_pt.split()[0]), int(end_pt.split()[1]), int(end_pt.split()[2])]    
         img[end_pt[0]][end_pt[1]][0:3] = [0,0,255]
         if(point_in_obstacle(start_pt) or point_in_obstacle(end_pt)): # check if either the start or end node an obstacle
             print("Enter valid points... ")
