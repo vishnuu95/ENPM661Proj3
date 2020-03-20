@@ -274,18 +274,24 @@ def find_children(curr_node):
     return children_list  # list of all children with a lesser cost for the current node
 
 
-def draw_vector():
-    cv2.arrowedLine(img, curr_node.iloc[0], curr_node.iloc[1], (255, 191, 0), 1)
+def draw_vector(curr_node):
+    global step_size
+    # print(curr_node.iloc[2])
+    cv2.arrowedLine(img, (curr_node.iloc[1], curr_node.iloc[0]),
+    ( int(curr_node.iloc[1]+3*step_size*np.sin(np.deg2rad(curr_node.iloc[2]))), int(curr_node.iloc[0]+3*step_size*np.cos(np.deg2rad(curr_node.iloc[2])))), (255, 144, 30))
     return    
 
 def add_image_frame(curr_node): # A function to add the newly explored state to a frame. This would also update the color based on the cost to come
     global img, vidWriter, ctr
     img[curr_node.iloc[0], curr_node.iloc[1],0:3] = [0,255,np.min([50 + curr_node.value_to_come*2, 255]) ]
-    # if ctr == 50:
-    #     draw_vector(curr_node)
-    #     ctr = 0
+    
+    if ctr == 40:
+        draw_vector(curr_node)
+        ctr = 0
+        # cv2.imshow("test", cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE))
+        # cv2.waitKey(0)
     vidWriter.write(cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE))
-    # ctr = ctr + 1
+    ctr = ctr + 1
     return
     
 
@@ -335,6 +341,7 @@ if __name__=="__main__":
     bot_r = int(input("Enter robot radius: "))
     clear_r = int(input("Enter the clearance: "))
     step_size = int(input("Enter step size: "))
+    step_size = step_size*trsh
     theta = int(input("Enter start orientation in degrees: "))
     total_clear = bot_r+clear_r
     define_map_start = time.time()
@@ -347,18 +354,14 @@ if __name__=="__main__":
 
     valid_points = False
     while  valid_points == False:
-        start_pt = (input("Enter start point in form # # #: "))
-        start_pt = [int(start_pt.split()[0]), int(start_pt.split()[1]),int(start_pt.split()[2])]
-        start_pt = [trsh*start_pt[0], trsh*start_pt[1],start_pt[2]]
+        start_pt = (input("Enter start point in form # #: "))
+        start_pt = [int(start_pt.split()[0]), int(start_pt.split()[1])]
+        start_pt = [trsh*start_pt[0], trsh*start_pt[1], theta ]
         img[start_pt[0]][start_pt[1]][0:3] = [0,0,0]
 
-        end_pt = (input("Enter end point in form # # (optional)#: "))
-        print (end_pt.split())
-        if len(end_pt.split()) < 3 :
-            end_pt = trsh*[int(end_pt.split()[0]), int(end_pt.split()[1]), 0]
-            print (end_pt)
-        else:
-            end_pt = trsh*[int((end_pt.split()[0])), int((end_pt.split()[1])), int((end_pt.split()[2]))]    
+        end_pt = (input("Enter end point in form # # : "))
+        end_pt = [trsh*int(end_pt.split()[0]), trsh*int(end_pt.split()[1]), 0]
+            # print (end_pt)
         img[end_pt[0]][end_pt[1]][0:3] = [0,0,255]
         if(point_in_obstacle(start_pt) or point_in_obstacle(end_pt)): # check if either the start or end node an obstacle
             print("Enter valid points... ")
