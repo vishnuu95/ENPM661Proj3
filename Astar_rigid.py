@@ -14,7 +14,8 @@ class node:
     def __init__(self, location, parent):
         global a, node_cnt
         self.loc = location
-        self.value = a.map[location[0]][location[1]][13]
+        self.iloc = [int(location[0]), int(location[1]), int(location[2])]
+        self.value = a.map[int(location[0])][int(location[1])][13]
         self.parent = parent
         self.counter = node_cnt
         node_cnt += 1
@@ -185,24 +186,30 @@ def allowable_moves(point):  # makes child states that are on the map and not on
 
     return allowable_square_moves, allowable_dia_moves
 '''
+def check_round(angle):
+    if angle >= 360:
+        angle = angle - 360
+    elif angle < 0:
+        angle = angle + 360
+    return angle        
 
 def allowable_check(point):
-    top,t_right,right,b_right,bottom = (point[0]+step_size*np.cos(np.deg2rad(point[2]+2*theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]+2*theta)),point[2]+2*theta),\
-                                        (point[0]+step_size*np.cos(np.deg2rad(point[2]+theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]+theta)),point[2]+theta),\
-                                        (point[0]+step_size*np.cos(np.deg2rad(point[2])),point[1]+step_size*np.sin(np.deg2rad(point[2])),point[2]),\
-                                        (point[0]+step_size*np.cos(np.deg2rad(point[2]-theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]-theta)),point[2]-theta),\
-                                        (point[0]+step_size*np.cos(np.deg2rad(point[2]-2*theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]-2*theta)),point[2]-2*theta)
-
-    itop,it_right,iright,ib_right,ibottom = (round(point[0]+step_size*np.cos(np.deg2rad(point[2]+2*theta))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]+2*theta))),point[2]+2*theta),\
-                                        (round(point[0]+step_size*np.cos(np.deg2rad(point[2]+theta))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]+theta))),point[2]+theta),\
-                                        (round(point[0]+step_size*np.cos(np.deg2rad(point[2]))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]))),point[2]),\
-                                        (round(point[0]+step_size*np.cos(np.deg2rad(point[2]-theta))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]-theta))),point[2]-theta),\
-                                        (round(point[0]+step_size*np.cos(np.deg2rad(point[2]-2*theta))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]-2*theta))),point[2]-2*theta)
+    top,t_right,right,b_right,bottom = (point[0]+step_size*np.cos(np.deg2rad(point[2]+2*theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]+2*theta)),check_round(point[2]+2*theta)),\
+                                        (point[0]+step_size*np.cos(np.deg2rad(point[2]+theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]+theta)),check_round(point[2]+theta)),\
+                                        (point[0]+step_size*np.cos(np.deg2rad(point[2])),point[1]+step_size*np.sin(np.deg2rad(point[2])),check_round(point[2])),\
+                                        (point[0]+step_size*np.cos(np.deg2rad(point[2]-theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]-theta)),check_round(point[2]-theta)),\
+                                        (point[0]+step_size*np.cos(np.deg2rad(point[2]-2*theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]-2*theta)),check_round(point[2]-2*theta))
+    
+    itop,it_right,iright,ib_right,ibottom = (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]+2*theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]+2*theta)))),check_round(point[2]+2*theta)),\
+                                        (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]+theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]+theta)))),check_round(point[2]+theta)),\
+                                        (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2])))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2])))),check_round(point[2])),\
+                                        (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]-theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]-theta)))),check_round(point[2]-theta)),\
+                                        (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]-2*theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]-2*theta)))),check_round(point[2]-2*theta))
     
     test_moves = list((itop,it_right,iright,ib_right,ibottom))
     actual_moves = list((top,t_right,right,b_right,bottom))
     allowable_actions = []
-    for move,amove in zip(test_square_moves,actual_square_moves):
+    for move,amove in zip(test_moves,actual_moves):
         if a.map[move[0],move[1],int(move[2]/30)]==0:  #check if visited
             if a.map.shape[0]>move[0] >=0:              #check if on map X
                 if a.map.shape[1] > move[1] >= 0:       #check if on map Y
@@ -216,7 +223,7 @@ def allowable_check(point):
 def is_goal(curr_node):              # checks if the current node is also the goal
     #if curr_node.loc[0] == end_pt[0] and curr_node.loc[1] == end_pt[1]:
     #    return True
-    if (curr_node[0]-end_pt[0])**2 + (curr_node[1]-end_pt[1])**2 < 2.25:
+    if (curr_node.loc[0]-end_pt[0])**2 + (curr_node.loc[1]-end_pt[1])**2 < 2.25:
         return True
 
 
@@ -227,7 +234,7 @@ def find_path(curr_node): # A function to find the path until the root by tracki
         final_path.insert(0, curr_node)
         curr_node = curr_node.parent
     for i in final_path:
-        img[i.loc[0], i.loc[1], 0:3] = [255,0,0]
+        img[i.iloc[0], i.iloc[1], 0:3] = [255,0,0]
         for j in range(3):
             vidWriter.write(cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE))
     vidWriter.release()         
@@ -242,8 +249,9 @@ def find_children(curr_node):
     child_cost = test_node.value + step_size + go_cost           # square move cost
     children_list = []
     for state_loc in child_loc:
-        if a.map[state_loc[0]][state_loc[1]][13] > child_cost:  # if the child cost is less from the current node
-            a.map[state_loc[0]][state_loc[1]][13] = child_cost  # update map node to lesser cost
+        # print(state_loc[0],state_loc[1])
+        if a.map[int(state_loc[0])][int(state_loc[1])][13] > child_cost:  # if the child cost is less from the current node
+            a.map[int(state_loc[0])][int(state_loc[1])][13] = child_cost  # update map node to lesser cost
             child_node = node(state_loc,curr_node)              # create new child node
             children_list.append((child_node.value, child_node.counter, child_node))
     '''
@@ -263,7 +271,7 @@ def find_children(curr_node):
 
 def add_image_frame(curr_node): # A function to add the newly explored state to a frame. This would also update the color based on the cost to come
     global img, vidWriter
-    img[curr_node.loc[0], curr_node.loc[1],0:3] = [0,255,np.min([50 + curr_node.value*2, 255]) ]
+    img[curr_node.iloc[0], curr_node.iloc[1],0:3] = [0,255,np.min([50 + curr_node.value*2, 255]) ]
     #cv2.imshow('LaureKaBaal',img)
     #cv2.waitKey(0)
     vidWriter.write(cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE))
@@ -273,7 +281,7 @@ def add_image_frame(curr_node): # A function to add the newly explored state to 
 def solver(curr_node):  # A function to be recursively called to find the djikstra solution
     while(1):
         #visitedNode.update({curr_node: "s"})
-        a.map[curr_node.loc[0],curr_node.loc[1],int(curr_node.loc[2]/30)]=1
+        a.map[curr_node.iloc[0],curr_node.iloc[1],int(curr_node.iloc[2]/30)]=1
 
         global l
         if (is_goal(curr_node)):
@@ -283,7 +291,7 @@ def solver(curr_node):  # A function to be recursively called to find the djikst
         add_image_frame(curr_node)
         children_list = find_children(curr_node) # a function to find possible children and update cost
         l = l + children_list                  # adding possible children to the list
-        if (l = []):
+        if (l == []):
             return 0
         heapq.heapify(l)                    # converting to a list
         curr_node = heapq.heappop(l)[2]            # recursive call to solver where we pass the element with the least cost 
@@ -308,8 +316,8 @@ if __name__=="__main__":
     node_cnt = 0
     final_path = []
     visitedNode = {}
-    vidWriter = cv2.VideoWriter("Astar.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 288, (300,200))
-    img = np.zeros([300*2,200*2,3], dtype=np.uint8)
+    vidWriter = cv2.VideoWriter("Astar.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 288, (300*trsh,200*trsh))
+    img = np.zeros([300*trsh,200*trsh,3], dtype=np.uint8)
     img[:,:,0:3] = [0,255,0]
     bot_r = int(input("Enter robot radius: "))
     clear_r = int(input("Enter the clearance: "))
@@ -330,10 +338,12 @@ if __name__=="__main__":
         img[start_pt[0]][start_pt[1]][0:3] = [0,0,0]
 
         end_pt = (input("Enter end point in form # # (optional)#: "))
+        print (end_pt.split())
         if len(end_pt.split()) < 3 :
-            end_pt = [int(end_pt.split()[0]), int(end_pt.split()[1]), 0]
+            end_pt = [trsh*int(end_pt.split()[0]), trsh*int(end_pt.split()[1]), 0]
+            print (end_pt)
         else:
-            end_pt = [int(end_pt.split()[0]), int(end_pt.split()[1]), int(end_pt.split()[2])]    
+            end_pt = [trsh*int((end_pt.split()[0])), trsh*int((end_pt.split()[1])), trsh*int((end_pt.split()[2]))]    
         img[end_pt[0]][end_pt[1]][0:3] = [0,0,255]
         if(point_in_obstacle(start_pt) or point_in_obstacle(end_pt)): # check if either the start or end node an obstacle
             print("Enter valid points... ")
