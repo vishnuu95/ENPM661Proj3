@@ -323,6 +323,8 @@ if __name__=="__main__":
     img[:,:,0:3] = [0,255,0]
     bot_r = int(input("Enter robot radius: "))
     clear_r = int(input("Enter the clearance: "))
+    step_size = int(input("Enter step size: "))
+    theta = int(input("Enter start orientation in degrees: "))
     total_clear = bot_r+clear_r
     define_map_start = time.time()
     define_map(total_clear)
@@ -342,10 +344,10 @@ if __name__=="__main__":
         end_pt = (input("Enter end point in form # # (optional)#: "))
         print (end_pt.split())
         if len(end_pt.split()) < 3 :
-            end_pt = [trsh*int(end_pt.split()[0]), trsh*int(end_pt.split()[1]), 0]
+            end_pt = trsh*[int(end_pt.split()[0]), int(end_pt.split()[1]), 0]
             print (end_pt)
         else:
-            end_pt = [trsh*int((end_pt.split()[0])), trsh*int((end_pt.split()[1])), trsh*int((end_pt.split()[2]))]    
+            end_pt = trsh*[int((end_pt.split()[0])), int((end_pt.split()[1])), int((end_pt.split()[2]))]    
         img[end_pt[0]][end_pt[1]][0:3] = [0,0,255]
         if(point_in_obstacle(start_pt) or point_in_obstacle(end_pt)): # check if either the start or end node an obstacle
             print("Enter valid points... ")
