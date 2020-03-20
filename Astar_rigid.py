@@ -153,41 +153,6 @@ def point_in_obstacle(point):  # checks is a point is in an obstacle
     else:
         return False
 
-'''
-def allowable_moves(point):  # makes child states that are on the map and not on obstacles
-
-    up,down,right,left = (point[0],point[1]+1),\
-                         (point[0],point[1]-1),\
-                         (point[0]+1,point[1]),\
-                         (point[0]-1,point[1])            # possible cardinal moves
-
-    nw,ne,sw,se = (point[0]-1,point[1]+1),\
-                  (point[0]+1,point[1]+1),\
-                  (point[0]-1,point[1]-1),\
-                  (point[0]+1,point[1]-1)                 # possible diagonal moves
-
-    test_square_moves = list((up,down,right,left))        # cardinal moves
-    allowable_square_moves = []
-    for move in test_square_moves:
-        if not move in visitedNode:
-            if a.map.shape[0] > move[0] >= 0:            # if on map X
-                if a.map.shape[1] > move[1] >= 0:        # if on map y
-                    if a.map[move[0],move[1],0] == 0:    # if not in obstacle
-
-                        allowable_square_moves.append(move)
-
-    test_dia_moves = list((nw,ne,sw,se))                  # diagonal moves
-    allowable_dia_moves = []
-    for move in test_dia_moves:
-        if not move in visitedNode:
-            if a.map.shape[0] > move[0] >= 0:            # if on the map x
-                if a.map.shape[1] > move[1] >= 0:        # if on the map y
-                    if a.map[move[0],move[1],0] == 0:    # if not in obstacle
-
-                        allowable_dia_moves.append(move)
-
-    return allowable_square_moves, allowable_dia_moves
-'''
 def check_round(angle):
     if angle >= 360:
         angle = angle - 360
@@ -237,10 +202,18 @@ def find_path(curr_node): # A function to find the path until the root by tracki
     while(curr_node!=None):
         final_path.insert(0, curr_node)
         curr_node = curr_node.parent
-    for i in final_path:
-        img[i.iloc[0], i.iloc[1], 0:3] = [255,0,0]
+    for i, value in enumerate(final_path):
+        curr = value
+        if i == 0:
+            continue
+        prev = curr
+        img[value.iloc[0], value.iloc[1], 0:3] = [255,0,0]
+        cv2.arrowedLine(img, (prev.iloc[1], prev.iloc[0]),(curr.iloc[1], curr.iloc[0]), (255, 144, 30), thickness=3)   
+        # cv2.imshow("try", cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE))
+        # cv2.waitKey(0)
         for j in range(3):
             vidWriter.write(cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE))
+
     vidWriter.release()         
     return
 
@@ -261,16 +234,7 @@ def find_children(curr_node):
             a.map[int(state_loc[0])][int(state_loc[1])][14] = go_cost
             child_node = node(state_loc,curr_node)              # create new child node
             children_list.append((child_node.value_to_come + child_node.value_to_go, child_node.counter, child_node))
-    '''
-    dia_child_loc = allowable_moves(curr_node.loc)[1]  # gets allowable diagonal moves
-    dia_child_cost = test_node.value + np.sqrt(2)      # diagonal moves cost
-    dia_children_list = []
-    for state_loc in dia_child_loc:
-        if a.map[state_loc[0]][state_loc[1]][1] > dia_child_cost:  # if the child cost is less from the current node
-            a.map[state_loc[0]][state_loc[1]][1] = dia_child_cost  # update map node to lesser cost
-            dia_child_node = node(state_loc, curr_node)            # create new child node
-            dia_children_list.append((dia_child_node.value, dia_child_node.counter, dia_child_node))
-    '''
+    
     return children_list  # list of all children with a lesser cost for the current node
 
 
@@ -285,11 +249,11 @@ def add_image_frame(curr_node): # A function to add the newly explored state to 
     global img, vidWriter, ctr
     img[curr_node.iloc[0], curr_node.iloc[1],0:3] = [0,255,np.min([50 + curr_node.value_to_come*2, 255]) ]
     
-    if ctr == 40:
-        draw_vector(curr_node)
-        ctr = 0
-        # cv2.imshow("test", cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE))
-        # cv2.waitKey(0)
+    # if ctr == 40:
+    #     draw_vector(curr_node)
+    #     ctr = 0
+    #     # cv2.imshow("test", cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE))
+    #     # cv2.waitKey(0)
     vidWriter.write(cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE))
     ctr = ctr + 1
     return
@@ -338,6 +302,9 @@ if __name__=="__main__":
     vidWriter = cv2.VideoWriter("Astar.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 288, (300*trsh,200*trsh))
     img = np.zeros([300*trsh,200*trsh,3], dtype=np.uint8)
     img[:,:,0:3] = [0,255,0]
+    # cv2.arrowedLine(img, (50, 50),(100, 100), (255, 144, 30), thickness = 5) 
+    # cv2.imshow("try", img)
+    # cv2.waitKey(0)
     bot_r = int(input("Enter robot radius: "))
     clear_r = int(input("Enter the clearance: "))
     step_size = int(input("Enter step size: "))
