@@ -193,11 +193,11 @@ def allowable_check(point):
                                         (point[0]+step_size*np.cos(np.deg2rad(point[2]-theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]-theta)),point[2]-theta),\
                                         (point[0]+step_size*np.cos(np.deg2rad(point[2]-2*theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]-2*theta)),point[2]-2*theta)
 
-    itop,it_right,iright,ib_right,ibottom = (round(point[0]+step_size*np.cos(np.deg2rad(point[2]+2*theta))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]+2*theta))),point[2]+2*theta),\
-                                        (round(point[0]+step_size*np.cos(np.deg2rad(point[2]+theta))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]+theta))),point[2]+theta),\
-                                        (round(point[0]+step_size*np.cos(np.deg2rad(point[2]))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]))),point[2]),\
-                                        (round(point[0]+step_size*np.cos(np.deg2rad(point[2]-theta))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]-theta))),point[2]-theta),\
-                                        (round(point[0]+step_size*np.cos(np.deg2rad(point[2]-2*theta))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]-2*theta))),point[2]-2*theta)
+    itop,it_right,iright,ib_right,ibottom = (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]+2*theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]+2*theta)))),point[2]+2*theta),\
+                                        (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]+theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]+theta)))),point[2]+theta),\
+                                        (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2])))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2])))),point[2]),\
+                                        (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]-theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]-theta)))),point[2]-theta),\
+                                        (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]-2*theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]-2*theta)))),point[2]-2*theta)
     
     test_moves = list((itop,it_right,iright,ib_right,ibottom))
     actual_moves = list((top,t_right,right,b_right,bottom))
