@@ -4,7 +4,7 @@ import numpy as np
 import heapq
 import time
 import math
-global l, final_path, img, vidWriter, node_cnt
+global l, final_path, img, vidWriter, node_cnt,trsh,step_size,theta
 sys.setrecursionlimit(10**9)
 #sys.settrace(exception)
 
@@ -108,7 +108,7 @@ def max_and_min(point_list):
 
 def define_map(clear_r):  # makes the map according to the assignment
     global a
-    trsh = 2
+    global trsh
     a = MapMake(300*trsh, 200*trsh)
     a.circle_obstacle(225*trsh, 150*trsh, 25*trsh)
     a.oval_obstacle(150*trsh,100*trsh,40*trsh,20*trsh)
@@ -186,23 +186,23 @@ def allowable_moves(point):  # makes child states that are on the map and not on
     return allowable_square_moves, allowable_dia_moves
 '''
 
-def allowable_check(points):
-    top,t_right,right,b_right,bottom = (point[0]+step_size*np.cos(np.deg2rad(2*theta)),point[1]+step_size*np.sin(np.deg2rad(2*theta))),\
-                                        (point[0]+step_size*np.cos(np.deg2rad(theta)),point[1]+step_size*np.sin(np.deg2rad(theta))),\
-                                        (point[0]+step_size,point[1]),\
-                                        (point[0]+step_size*np.cos(np.deg2rad(theta)),point[1]+step_size*np.sin(np.deg2rad(theta))),\
-                                        (point[0]+step_size*np.cos(np.deg2rad(2*theta)),point[1]+step_size*np.sin(np.deg2rad(2*theta)))
+def allowable_check(point):
+    top,t_right,right,b_right,bottom = (point[0]+step_size*np.cos(np.deg2rad(point[2]+2*theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]+2*theta)),point[2]+2*theta),\
+                                        (point[0]+step_size*np.cos(np.deg2rad(point[2]+theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]+theta)),point[2]+theta),\
+                                        (point[0]+step_size*np.cos(np.deg2rad(point[2])),point[1]+step_size*np.sin(np.deg2rad(point[2])),point[2]),\
+                                        (point[0]+step_size*np.cos(np.deg2rad(point[2]-theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]-theta)),point[2]-theta),\
+                                        (point[0]+step_size*np.cos(np.deg2rad(point[2]-2*theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]-2*theta)),point[2]-2*theta)
 
-    itop,it_right,iright,ib_right,ibottom = (round(point[0]+step_size*np.cos(np.deg2rad(2*theta))),round(point[1]+step_size*np.sin(np.deg2rad(2*theta)))),\
-                                        (round(point[0]+step_size*np.cos(np.deg2rad(theta))),round(point[1]+step_size*np.sin(np.deg2rad(theta)))),\
-                                        (round(point[0]+step_size),round(point[1])),\
-                                        (round(point[0]+step_size*np.cos(np.deg2rad(theta))),round(point[1]+step_size*np.sin(np.deg2rad(theta)))),\
-                                        (round(point[0]+step_size*np.cos(np.deg2rad(2*theta))),round(point[1]+step_size*np.sin(np.deg2rad(2*theta))))
+    itop,it_right,iright,ib_right,ibottom = (round(point[0]+step_size*np.cos(np.deg2rad(point[2]+2*theta))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]+2*theta))),point[2]+2*theta),\
+                                        (round(point[0]+step_size*np.cos(np.deg2rad(point[2]+theta))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]+theta))),point[2]+theta),\
+                                        (round(point[0]+step_size*np.cos(np.deg2rad(point[2]))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]))),point[2]),\
+                                        (round(point[0]+step_size*np.cos(np.deg2rad(point[2]-theta))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]-theta))),point[2]-theta),\
+                                        (round(point[0]+step_size*np.cos(np.deg2rad(point[2]-2*theta))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]-2*theta))),point[2]-2*theta)
     
     test_moves = list((itop,it_right,iright,ib_right,ibottom))
     actual_moves = list((top,t_right,right,b_right,bottom))
     allowable_actions = []
-    for move,amove in test_moves,actual_moves:
+    for move,amove in zip(test_square_moves,actual_square_moves):
         if a.map[move[0],move[1],int(move[2]/30)]==0:  #check if visited
             if a.map.shape[0]>move[0] >=0:              #check if on map X
                 if a.map.shape[1] > move[1] >= 0:       #check if on map Y
@@ -300,7 +300,11 @@ if __name__=="__main__":
     global visitedNode
     global step_size
     global theta
-    
+    global trsh
+
+    step_size = 2
+    theta = 30
+    trsh = 2
     node_cnt = 0
     final_path = []
     visitedNode = {}
@@ -322,7 +326,7 @@ if __name__=="__main__":
     while  valid_points == False:
         start_pt = (input("Enter start point in form # # #: "))
         start_pt = [int(start_pt.split()[0]), int(start_pt.split()[1]),int(start_pt.split()[2])]
-        start_pt = [2*start_pt[0], 2*start_pt[1],start_pt[2]]
+        start_pt = [trsh*start_pt[0], trsh*start_pt[1],start_pt[2]]
         img[start_pt[0]][start_pt[1]][0:3] = [0,0,0]
 
         end_pt = (input("Enter end point in form # # (optional)#: "))
