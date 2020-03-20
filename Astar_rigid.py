@@ -13,7 +13,7 @@ class node:
     def __init__(self, location, parent):
         global a, node_cnt
         self.loc = location
-        self.value = a.map[location[0]][location[1]][1]
+        self.value = a.map[location[0]][location[1]][13]
         self.parent = parent
         self.counter = node_cnt
         node_cnt += 1
@@ -272,7 +272,6 @@ def add_image_frame(curr_node): # A function to add the newly explored state to 
 def solver(curr_node):  # A function to be recursively called to find the djikstra solution
     while(1):
         #visitedNode.update({curr_node: "s"})
-        
         a.map[curr_node.loc[0],curr_node.loc[1],int(curr_node.loc[2]/30)]=1
 
         global l
@@ -313,7 +312,7 @@ if __name__=="__main__":
     t1 = time.time()-define_map_start
     print("Time to define map: " + str(t1))
     solve_problem_start = time.time()
-    visualize_map()
+    # visualize_map()
 
 
     valid_points = False
@@ -323,10 +322,11 @@ if __name__=="__main__":
         start_pt = [2*start_pt[0], 2*start_pt[1],start_pt[2]]
         img[start_pt[0]][start_pt[1]][0:3] = [0,0,0]
 
-        end_pt = (input("Enter end point in form # #: "))
-        end_pt = [int(end_pt.split()[0]), int(end_pt.split()[1])]
-        end_pt = [2*end_pt[0], 2*end_pt[1]]
-
+        end_pt = (input("Enter end point in form # # (optional)#: "))
+        if len(end_pt.split()) < 3 :
+            end_pt = [int(end_pt.split()[0]), int(end_pt.split()[1]), 0]
+        else:
+            end_pt = [int(end_pt.split())[0], int(end_pt.split())[1], int(end_pt.split())[2]]    
         img[end_pt[0]][end_pt[1]][0:3] = [0,0,255]
         if(point_in_obstacle(start_pt) or point_in_obstacle(end_pt)): # check if either the start or end node an obstacle
             print("Enter valid points... ")
