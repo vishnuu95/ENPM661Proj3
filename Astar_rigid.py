@@ -14,7 +14,7 @@ class node:
     def __init__(self, location, parent):
         global a, node_cnt
         self.loc = location
-        self.value = a.map[location[0]][location[1]][1]
+        self.value = a.map[location[0]][location[1]][13]
         self.parent = parent
         self.counter = node_cnt
         node_cnt += 1
@@ -25,14 +25,14 @@ class MapMake:
     def __init__(self, width_x, length_y):
         self.width_x = width_x
         self.length_y = length_y
-        self.map = np.zeros([width_x, length_y, 2])
-        self.map[:,:, 1] = np.inf                   # last element stores the cost to come
+        self.map = np.zeros([width_x, length_y, 14])
+        self.map[:,:, 13] = np.inf                   # last element stores the cost to come
 
     def circle_obstacle(self, xpos, ypos, radius):  # makes a circle obstacle
         for i in np.arange(xpos-radius,xpos+radius,1):
             for j in np.arange(ypos-radius,ypos+radius,1):
                 if np.sqrt(np.square(ypos - j) + np.square(xpos - i)) <= radius:
-                    self.map[i, j, 0] = 1
+                    self.map[i, j, 12] = 1
                     img[i,j,0:3] = [0,0,255]
 
     def oval_obstacle(self, xpos, ypos, radius_x, radius_y):  # makes oval obstacle
@@ -41,7 +41,7 @@ class MapMake:
                 first_oval_term = np.square(i - xpos) / np.square(radius_x)
                 second_oval_term = np.square(j - ypos) / np.square(radius_y)
                 if first_oval_term + second_oval_term <= 1:
-                    self.map[i, j, 0] = 1
+                    self.map[i, j, 12] = 1
                     img[i,j,0:3] = [0,0,255]
 
     def triangle_obstacle(self,three_points): # makes triangle obstacle
@@ -59,22 +59,22 @@ class MapMake:
                 pos = (d1 > 0) or (d2 > 0) or (d3 > 0)
 
                 if not (neg and pos):
-                    a.map[int(i)][int(j)][0] = 1
+                    a.map[int(i)][int(j)][12] = 1
                     img[int(i), int(j), 0:3] = [0, 0, 255]
 
     def clearance(self, clearance_distance):
 
-        self.map[self.width_x-clearance_distance:self.width_x,:,0] = 2  # makes edge clearance in map
-        self.map[0:clearance_distance,:,0] = 2
-        self.map[:, 0:clearance_distance, 0] = 2
-        self.map[:, self.length_y-clearance_distance:self.length_y, 0] = 2
+        self.map[self.width_x-clearance_distance:self.width_x,:,12] = 2  # makes edge clearance in map
+        self.map[0:clearance_distance,:,12] = 2
+        self.map[:, 0:clearance_distance, 12] = 2
+        self.map[:, self.length_y-clearance_distance:self.length_y, 12] = 2
 
-        img[0:clearance_distance, :, 0:3] = [0, 0, 200]                 # makes edge clearance in image
-        img[self.width_x-clearance_distance:self.width_x, :, 0:3] = [0, 0, 200]
-        img[:, 0:clearance_distance, 0:3] = [0, 0, 200]
-        img[:, self.length_y-clearance_distance:self.length_y, 0:3] = [0, 0, 200]
+        img[0:clearance_distance, :, 0:3] = [0, 69, 200]                 # makes edge clearance in image
+        img[self.width_x-clearance_distance:self.width_x, :, 0:3] = [0, 69, 200]
+        img[:, 0:clearance_distance, 0:3] = [0, 69, 200]
+        img[:, self.length_y-clearance_distance:self.length_y, 0:3] = [0, 69, 200]
 
-        obstacles = np.where(self.map[:, :, 0] == 1)
+        obstacles = np.where(self.map[:, :, 12] == 1)
         obstacles = np.array(obstacles)
         obstacles = obstacles.T  # get all points that are in obstacles
 
@@ -88,9 +88,9 @@ class MapMake:
         for obstacle_point in obstacles:
             bound_list = obstacle_point+circle_list
             for bound in bound_list:
-                if a.map[bound[0], bound[1],0] == 0:
-                    a.map[bound[0], bound[1],0] = 2
-                    img[bound[0], bound[1], 0:3] = [0, 0, 200]
+                if a.map[bound[0], bound[1],12] == 0:
+                    a.map[bound[0], bound[1],12] = 2
+                    img[bound[0], bound[1], 0:3] = [0, 69, 200]
 
 
 def sign(point1,point2,point3):
@@ -199,8 +199,8 @@ def allowable_check(point):
                                         (round(point[0]+step_size*np.cos(np.deg2rad(point[2]-theta))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]-theta))),point[2]-theta),\
                                         (round(point[0]+step_size*np.cos(np.deg2rad(point[2]-2*theta))),round(point[1]+step_size*np.sin(np.deg2rad(point[2]-2*theta))),point[2]-2*theta)
     
-    test_square_moves = list((itop,it_right,iright,ib_right,ibottom))
-    actual_square_moves = list((top,t_right,right,b_right,bottom))
+    test_moves = list((itop,it_right,iright,ib_right,ibottom))
+    actual_moves = list((top,t_right,right,b_right,bottom))
     allowable_actions = []
     for move,amove in zip(test_square_moves,actual_square_moves):
         if a.map[move[0],move[1],int(move[2]/30)]==0:  #check if visited
@@ -237,15 +237,15 @@ def find_path(curr_node): # A function to find the path until the root by tracki
 def find_children(curr_node):
     test_node = curr_node
 
-    sqr_child_loc = allowable_moves(curr_node.loc)  # gets allowable cardinal moves
-    go_cost = math.sqrt((curr_node[0]-end_pt[0])**2 + (curr_node[1]-end_pt[1])**2)
-    sqr_child_cost = test_node.value + step_size + go_cost           # square move cost
-    sqr_children_list = []
-    for state_loc in sqr_child_loc:
-        if a.map[state_loc[0]][state_loc[1]][1] > sqr_child_cost:  # if the child cost is less from the current node
-            a.map[state_loc[0]][state_loc[1]][1] = sqr_child_cost  # update map node to lesser cost
-            sqr_child_node = node(state_loc,curr_node)              # create new child node
-            sqr_children_list.append((sqr_child_node.value, sqr_child_node.counter, sqr_child_node))
+    child_loc = allowable_check(curr_node.loc)  # gets allowable cardinal moves
+    go_cost = math.sqrt((curr_node.loc[0]-end_pt[0])**2 + (curr_node.loc[1]-end_pt[1])**2)
+    child_cost = test_node.value + step_size + go_cost           # square move cost
+    children_list = []
+    for state_loc in child_loc:
+        if a.map[state_loc[0]][state_loc[1]][13] > child_cost:  # if the child cost is less from the current node
+            a.map[state_loc[0]][state_loc[1]][13] = child_cost  # update map node to lesser cost
+            child_node = node(state_loc,curr_node)              # create new child node
+            children_list.append((child_node.value, child_node.counter, child_node))
     '''
     dia_child_loc = allowable_moves(curr_node.loc)[1]  # gets allowable diagonal moves
     dia_child_cost = test_node.value + np.sqrt(2)      # diagonal moves cost
@@ -256,7 +256,6 @@ def find_children(curr_node):
             dia_child_node = node(state_loc, curr_node)            # create new child node
             dia_children_list.append((dia_child_node.value, dia_child_node.counter, dia_child_node))
     '''
-    children_list = sqr_children_list
     return children_list  # list of all children with a lesser cost for the current node
 
 
@@ -274,7 +273,6 @@ def add_image_frame(curr_node): # A function to add the newly explored state to 
 def solver(curr_node):  # A function to be recursively called to find the djikstra solution
     while(1):
         #visitedNode.update({curr_node: "s"})
-        
         a.map[curr_node.loc[0],curr_node.loc[1],int(curr_node.loc[2]/30)]=1
 
         global l
@@ -285,6 +283,8 @@ def solver(curr_node):  # A function to be recursively called to find the djikst
         add_image_frame(curr_node)
         children_list = find_children(curr_node) # a function to find possible children and update cost
         l = l + children_list                  # adding possible children to the list
+        if (l = []):
+            return 0
         heapq.heapify(l)                    # converting to a list
         curr_node = heapq.heappop(l)[2]            # recursive call to solver where we pass the element with the least cost 
     return 1        
@@ -308,7 +308,7 @@ if __name__=="__main__":
     node_cnt = 0
     final_path = []
     visitedNode = {}
-    vidWriter = cv2.VideoWriter("Djikstra.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 288, (300,200))
+    vidWriter = cv2.VideoWriter("Astar.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 288, (300,200))
     img = np.zeros([300*2,200*2,3], dtype=np.uint8)
     img[:,:,0:3] = [0,255,0]
     bot_r = int(input("Enter robot radius: "))
@@ -319,7 +319,7 @@ if __name__=="__main__":
     t1 = time.time()-define_map_start
     print("Time to define map: " + str(t1))
     solve_problem_start = time.time()
-    #visualize_map()
+    # visualize_map()
 
 
     valid_points = False
@@ -329,10 +329,11 @@ if __name__=="__main__":
         start_pt = [trsh*start_pt[0], trsh*start_pt[1],start_pt[2]]
         img[start_pt[0]][start_pt[1]][0:3] = [0,0,0]
 
-        end_pt = (input("Enter end point in form # #: "))
-        end_pt = [int(end_pt.split()[0]), int(end_pt.split()[1])]
-        end_pt = [2*end_pt[0], 2*end_pt[1]]
-
+        end_pt = (input("Enter end point in form # # (optional)#: "))
+        if len(end_pt.split()) < 3 :
+            end_pt = [int(end_pt.split()[0]), int(end_pt.split()[1]), 0]
+        else:
+            end_pt = [int(end_pt.split()[0]), int(end_pt.split()[1]), int(end_pt.split()[2])]    
         img[end_pt[0]][end_pt[1]][0:3] = [0,0,255]
         if(point_in_obstacle(start_pt) or point_in_obstacle(end_pt)): # check if either the start or end node an obstacle
             print("Enter valid points... ")
