@@ -24,14 +24,14 @@ class MapMake:
     def __init__(self, width_x, length_y):
         self.width_x = width_x
         self.length_y = length_y
-        self.map = np.zeros([width_x, length_y, 2])
-        self.map[:,:, 1] = np.inf                   # last element stores the cost to come
+        self.map = np.zeros([width_x, length_y, 14])
+        self.map[:,:, 13] = np.inf                   # last element stores the cost to come
 
     def circle_obstacle(self, xpos, ypos, radius):  # makes a circle obstacle
         for i in np.arange(xpos-radius,xpos+radius,1):
             for j in np.arange(ypos-radius,ypos+radius,1):
                 if np.sqrt(np.square(ypos - j) + np.square(xpos - i)) <= radius:
-                    self.map[i, j, 0] = 1
+                    self.map[i, j, 12] = 1
                     img[i,j,0:3] = [0,0,255]
 
     def oval_obstacle(self, xpos, ypos, radius_x, radius_y):  # makes oval obstacle
@@ -40,7 +40,7 @@ class MapMake:
                 first_oval_term = np.square(i - xpos) / np.square(radius_x)
                 second_oval_term = np.square(j - ypos) / np.square(radius_y)
                 if first_oval_term + second_oval_term <= 1:
-                    self.map[i, j, 0] = 1
+                    self.map[i, j, 12] = 1
                     img[i,j,0:3] = [0,0,255]
 
     def triangle_obstacle(self,three_points): # makes triangle obstacle
@@ -58,22 +58,22 @@ class MapMake:
                 pos = (d1 > 0) or (d2 > 0) or (d3 > 0)
 
                 if not (neg and pos):
-                    a.map[int(i)][int(j)][0] = 1
+                    a.map[int(i)][int(j)][12] = 1
                     img[int(i), int(j), 0:3] = [0, 0, 255]
 
     def clearance(self, clearance_distance):
 
-        self.map[self.width_x-clearance_distance:self.width_x,:,0] = 2  # makes edge clearance in map
-        self.map[0:clearance_distance,:,0] = 2
-        self.map[:, 0:clearance_distance, 0] = 2
-        self.map[:, self.length_y-clearance_distance:self.length_y, 0] = 2
+        self.map[self.width_x-clearance_distance:self.width_x,:,12] = 2  # makes edge clearance in map
+        self.map[0:clearance_distance,:,12] = 2
+        self.map[:, 0:clearance_distance, 12] = 2
+        self.map[:, self.length_y-clearance_distance:self.length_y, 12] = 2
 
-        img[0:clearance_distance, :, 0:3] = [0, 0, 200]                 # makes edge clearance in image
-        img[self.width_x-clearance_distance:self.width_x, :, 0:3] = [0, 0, 200]
-        img[:, 0:clearance_distance, 0:3] = [0, 0, 200]
-        img[:, self.length_y-clearance_distance:self.length_y, 0:3] = [0, 0, 200]
+        img[0:clearance_distance, :, 0:3] = [0, 69, 200]                 # makes edge clearance in image
+        img[self.width_x-clearance_distance:self.width_x, :, 0:3] = [0, 69, 200]
+        img[:, 0:clearance_distance, 0:3] = [0, 69, 200]
+        img[:, self.length_y-clearance_distance:self.length_y, 0:3] = [0, 69, 200]
 
-        obstacles = np.where(self.map[:, :, 0] == 1)
+        obstacles = np.where(self.map[:, :, 12] == 1)
         obstacles = np.array(obstacles)
         obstacles = obstacles.T  # get all points that are in obstacles
 
@@ -87,9 +87,9 @@ class MapMake:
         for obstacle_point in obstacles:
             bound_list = obstacle_point+circle_list
             for bound in bound_list:
-                if a.map[bound[0], bound[1],0] == 0:
-                    a.map[bound[0], bound[1],0] = 2
-                    img[bound[0], bound[1], 0:3] = [0, 0, 200]
+                if a.map[bound[0], bound[1],12] == 0:
+                    a.map[bound[0], bound[1],12] = 2
+                    img[bound[0], bound[1], 0:3] = [0, 69, 200]
 
 
 def sign(point1,point2,point3):
@@ -242,7 +242,8 @@ def add_image_frame(curr_node): # A function to add the newly explored state to 
 
 def solver(curr_node):  # A function to be recursively called to find the djikstra solution
     while(1):
-        visitedNode.update({curr_node: "s"})
+        # visitedNode.update({curr_node: "s"})
+        
         global l
         if (is_goal(curr_node)):
             find_path(curr_node) # find the path to the start node by tracking the node's parent
@@ -267,7 +268,7 @@ if __name__=="__main__":
     node_cnt = 0
     final_path = []
     visitedNode = {}
-    vidWriter = cv2.VideoWriter("Djikstra.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 288, (300,200))
+    vidWriter = cv2.VideoWriter("Astar.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 288, (300,200))
     img = np.zeros([300*2,200*2,3], dtype=np.uint8)
     img[:,:,0:3] = [0,255,0]
     bot_r = int(input("Enter robot radius: "))
@@ -278,7 +279,7 @@ if __name__=="__main__":
     t1 = time.time()-define_map_start
     print("Time to define map: " + str(t1))
     solve_problem_start = time.time()
-    #visualize_map()
+    visualize_map()
 
 
     valid_points = False
