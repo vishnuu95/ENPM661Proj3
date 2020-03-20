@@ -149,7 +149,7 @@ def point_in_obstacle(point):  # checks is a point is in an obstacle
     else:
         return False
 
-
+'''
 def allowable_moves(point):  # makes child states that are on the map and not on obstacles
 
     up,down,right,left = (point[0],point[1]+1),\
@@ -183,10 +183,39 @@ def allowable_moves(point):  # makes child states that are on the map and not on
                         allowable_dia_moves.append(move)
 
     return allowable_square_moves, allowable_dia_moves
+'''
 
+def allowable_check(points):
+
+    top,t_right,right,b_right,bottom = (int(point[0]+step_size*np.cos(np.deg2rad(2*theta))),int(point[1]+step_size*np.sin(np.deg2rad(2*theta)))),\
+                                        (int(point[0]+step_size*np.cos(np.deg2rad(theta))),int(point[1]+step_size*np.sin(np.deg2rad(theta)))),\
+                                        (int(point[0]+step_size),int(point[1])),\
+                                        (int(point[0]+step_size*np.cos(np.deg2rad(theta))),int(point[1]+step_size*np.sin(np.deg2rad(theta)))),\
+                                        (int(point[0]+step_size*np.cos(np.deg2rad(2*theta))),int(point[1]+step_size*np.sin(np.deg2rad(2*theta))))
+                                        
+    top,t_right,right,b_right,bottom = (int(point[0]+step_size*np.cos(np.deg2rad(2*theta))),int(point[1]+step_size*np.sin(np.deg2rad(2*theta)))),\
+                                        (int(point[0]+step_size*np.cos(np.deg2rad(theta))),int(point[1]+step_size*np.sin(np.deg2rad(theta)))),\
+                                        (int(point[0]+step_size),int(point[1])),\
+                                        (int(point[0]+step_size*np.cos(np.deg2rad(theta))),int(point[1]+step_size*np.sin(np.deg2rad(theta)))),\
+                                        (int(point[0]+step_size*np.cos(np.deg2rad(2*theta))),int(point[1]+step_size*np.sin(np.deg2rad(2*theta))))
+    
+    test_square_moves = list((top,t_right,right,b_right,bottom))
+    allowable_actions = []
+    for move in test_square_moves:
+        if a.map[move[0],move[1],int(move[2]/30)]==0:  #check if visited
+            if a.map.shape[0]>move[0] >=0:              #check if on map X
+                if a.map.shape[1] > move[1] >= 0:       #check if on map Y
+                  if a.map[move[0],move[1],12] == 0:    #check if obstacle
+
+                    allowable_actions.append(move)  
+
+
+    return allowable_actions
 
 def is_goal(curr_node):              # checks if the current node is also the goal
-    if curr_node.loc[0] == end_pt[0] and curr_node.loc[1] == end_pt[1]:
+    #if curr_node.loc[0] == end_pt[0] and curr_node.loc[1] == end_pt[1]:
+    #    return True
+    if (curr_node[0]-end_pt[0])**2 + (curr_node[1]-end_pt[1])**2 < 2.25:
         return True
 
 
@@ -242,8 +271,10 @@ def add_image_frame(curr_node): # A function to add the newly explored state to 
 
 def solver(curr_node):  # A function to be recursively called to find the djikstra solution
     while(1):
-        # visitedNode.update({curr_node: "s"})
+        #visitedNode.update({curr_node: "s"})
         
+        a.map[curr_node.loc[0],curr_node.loc[1],int(curr_node.loc[2]/30)]=1
+
         global l
         if (is_goal(curr_node)):
             find_path(curr_node) # find the path to the start node by tracking the node's parent
@@ -265,6 +296,9 @@ if __name__=="__main__":
     global node_cnt
     global final_path
     global visitedNode
+    global step_size
+    global theta
+    
     node_cnt = 0
     final_path = []
     visitedNode = {}
@@ -284,12 +318,14 @@ if __name__=="__main__":
 
     valid_points = False
     while  valid_points == False:
-        start_pt = (input("Enter start point in form # #: "))
-        start_pt = [int(start_pt.split()[0]), int(start_pt.split()[1])]
+        start_pt = (input("Enter start point in form # # #: "))
+        start_pt = [int(start_pt.split()[0]), int(start_pt.split()[1]),int(start_pt.split()[2])]
+        start_pt = [2*start_pt[0], 2*start_pt[1],start_pt[2]]
         img[start_pt[0]][start_pt[1]][0:3] = [0,0,0]
 
         end_pt = (input("Enter end point in form # #: "))
         end_pt = [int(end_pt.split()[0]), int(end_pt.split()[1])]
+        end_pt = [2*end_pt[0], 2*end_pt[1]]
 
         img[end_pt[0]][end_pt[1]][0:3] = [0,0,255]
         if(point_in_obstacle(start_pt) or point_in_obstacle(end_pt)): # check if either the start or end node an obstacle
