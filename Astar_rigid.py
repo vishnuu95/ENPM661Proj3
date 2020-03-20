@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import heapq
 import time
+import math
 global l, final_path, img, vidWriter, node_cnt
 sys.setrecursionlimit(10**9)
 #sys.settrace(exception)
@@ -186,28 +187,28 @@ def allowable_moves(point):  # makes child states that are on the map and not on
 '''
 
 def allowable_check(points):
+    top,t_right,right,b_right,bottom = (point[0]+step_size*np.cos(np.deg2rad(2*theta)),point[1]+step_size*np.sin(np.deg2rad(2*theta))),\
+                                        (point[0]+step_size*np.cos(np.deg2rad(theta)),point[1]+step_size*np.sin(np.deg2rad(theta))),\
+                                        (point[0]+step_size,point[1]),\
+                                        (point[0]+step_size*np.cos(np.deg2rad(theta)),point[1]+step_size*np.sin(np.deg2rad(theta))),\
+                                        (point[0]+step_size*np.cos(np.deg2rad(2*theta)),point[1]+step_size*np.sin(np.deg2rad(2*theta)))
 
-    top,t_right,right,b_right,bottom = (int(point[0]+step_size*np.cos(np.deg2rad(2*theta))),int(point[1]+step_size*np.sin(np.deg2rad(2*theta)))),\
-                                        (int(point[0]+step_size*np.cos(np.deg2rad(theta))),int(point[1]+step_size*np.sin(np.deg2rad(theta)))),\
-                                        (int(point[0]+step_size),int(point[1])),\
-                                        (int(point[0]+step_size*np.cos(np.deg2rad(theta))),int(point[1]+step_size*np.sin(np.deg2rad(theta)))),\
-                                        (int(point[0]+step_size*np.cos(np.deg2rad(2*theta))),int(point[1]+step_size*np.sin(np.deg2rad(2*theta))))
-                                        
-    top,t_right,right,b_right,bottom = (int(point[0]+step_size*np.cos(np.deg2rad(2*theta))),int(point[1]+step_size*np.sin(np.deg2rad(2*theta)))),\
-                                        (int(point[0]+step_size*np.cos(np.deg2rad(theta))),int(point[1]+step_size*np.sin(np.deg2rad(theta)))),\
-                                        (int(point[0]+step_size),int(point[1])),\
-                                        (int(point[0]+step_size*np.cos(np.deg2rad(theta))),int(point[1]+step_size*np.sin(np.deg2rad(theta)))),\
-                                        (int(point[0]+step_size*np.cos(np.deg2rad(2*theta))),int(point[1]+step_size*np.sin(np.deg2rad(2*theta))))
+    itop,it_right,iright,ib_right,ibottom = (round(point[0]+step_size*np.cos(np.deg2rad(2*theta))),round(point[1]+step_size*np.sin(np.deg2rad(2*theta)))),\
+                                        (round(point[0]+step_size*np.cos(np.deg2rad(theta))),round(point[1]+step_size*np.sin(np.deg2rad(theta)))),\
+                                        (round(point[0]+step_size),round(point[1])),\
+                                        (round(point[0]+step_size*np.cos(np.deg2rad(theta))),round(point[1]+step_size*np.sin(np.deg2rad(theta)))),\
+                                        (round(point[0]+step_size*np.cos(np.deg2rad(2*theta))),round(point[1]+step_size*np.sin(np.deg2rad(2*theta))))
     
-    test_square_moves = list((top,t_right,right,b_right,bottom))
+    test_square_moves = list((itop,it_right,iright,ib_right,ibottom))
+    actual_square_moves = list((top,t_right,right,b_right,bottom))
     allowable_actions = []
-    for move in test_square_moves:
+    for move,amove in test_square_moves,actual_square_moves:
         if a.map[move[0],move[1],int(move[2]/30)]==0:  #check if visited
             if a.map.shape[0]>move[0] >=0:              #check if on map X
                 if a.map.shape[1] > move[1] >= 0:       #check if on map Y
                   if a.map[move[0],move[1],12] == 0:    #check if obstacle
 
-                    allowable_actions.append(move)  
+                    allowable_actions.append(amove)  
 
 
     return allowable_actions
@@ -236,15 +237,16 @@ def find_path(curr_node): # A function to find the path until the root by tracki
 def find_children(curr_node):
     test_node = curr_node
 
-    sqr_child_loc = allowable_moves(curr_node.loc)[0]  # gets allowable cardinal moves
-    sqr_child_cost = test_node.value + 1               # square move cost
+    sqr_child_loc = allowable_moves(curr_node.loc)  # gets allowable cardinal moves
+    go_cost = math.sqrt((curr_node[0]-end_pt[0])**2 + (curr_node[1]-end_pt[1])**2)
+    sqr_child_cost = test_node.value + step_size + go_cost           # square move cost
     sqr_children_list = []
     for state_loc in sqr_child_loc:
         if a.map[state_loc[0]][state_loc[1]][1] > sqr_child_cost:  # if the child cost is less from the current node
             a.map[state_loc[0]][state_loc[1]][1] = sqr_child_cost  # update map node to lesser cost
             sqr_child_node = node(state_loc,curr_node)              # create new child node
             sqr_children_list.append((sqr_child_node.value, sqr_child_node.counter, sqr_child_node))
-
+    '''
     dia_child_loc = allowable_moves(curr_node.loc)[1]  # gets allowable diagonal moves
     dia_child_cost = test_node.value + np.sqrt(2)      # diagonal moves cost
     dia_children_list = []
@@ -253,8 +255,8 @@ def find_children(curr_node):
             a.map[state_loc[0]][state_loc[1]][1] = dia_child_cost  # update map node to lesser cost
             dia_child_node = node(state_loc, curr_node)            # create new child node
             dia_children_list.append((dia_child_node.value, dia_child_node.counter, dia_child_node))
-
-    children_list = sqr_children_list + dia_children_list
+    '''
+    children_list = sqr_children_list
     return children_list  # list of all children with a lesser cost for the current node
 
 
