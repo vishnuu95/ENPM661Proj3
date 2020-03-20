@@ -14,8 +14,9 @@ class node:
     def __init__(self, location, parent):
         global a, node_cnt
         self.loc = location
-        self.iloc = [int(location[0]), int(location[1]), int(location[2])]
-        self.value = a.map[int(location[0])][int(location[1])][13]
+        self.iloc = [int(round(location[0])), int(round(location[1])), int(round(location[2]))]
+        self.value_to_come = a.map[int(location[0])][int(location[1])][13]
+        self.value_to_go = a.map[int(location[0])][int(location[1])][14]
         self.parent = parent
         self.counter = node_cnt
         node_cnt += 1
@@ -26,8 +27,9 @@ class MapMake:
     def __init__(self, width_x, length_y):
         self.width_x = width_x
         self.length_y = length_y
-        self.map = np.zeros([width_x, length_y, 14])
+        self.map = np.zeros([width_x, length_y, 15])
         self.map[:,:, 13] = np.inf                   # last element stores the cost to come
+        self.map[:,:,14] = np.inf                    # last element stores the cost to go
 
     def circle_obstacle(self, xpos, ypos, radius):  # makes a circle obstacle
         for i in np.arange(xpos-radius,xpos+radius,1):
@@ -245,15 +247,18 @@ def find_children(curr_node):
     test_node = curr_node
 
     child_loc = allowable_check(curr_node.loc)  # gets allowable cardinal moves
-    go_cost = math.sqrt((curr_node.loc[0]-end_pt[0])**2 + (curr_node.loc[1]-end_pt[1])**2)
-    child_cost = test_node.value + step_size + go_cost           # square move cost
+    child_cost_to_come = test_node.value_to_come + step_size            # square move cost
+    # print (child_cost_to_come)
     children_list = []
     for state_loc in child_loc:
-        # print(state_loc[0],state_loc[1])
-        if a.map[int(state_loc[0])][int(state_loc[1])][13] > child_cost:  # if the child cost is less from the current node
-            a.map[int(state_loc[0])][int(state_loc[1])][13] = child_cost  # update map node to lesser cost
+        go_cost = math.sqrt((state_loc[0]-end_pt[0])**2 + (state_loc[1]-end_pt[1])**2)
+        # print (go_cost)
+        if (a.map[int(state_loc[0])][int(state_loc[1])][13] + a.map[int(state_loc[0])][int(state_loc[1])][14] > child_cost_to_come + go_cost):  # if the child cost is less from the current node
+            # print("2")
+            a.map[int(state_loc[0])][int(state_loc[1])][13] = child_cost_to_come              # update map node to lesser cost
+            a.map[int(state_loc[0])][int(state_loc[1])][14] = go_cost
             child_node = node(state_loc,curr_node)              # create new child node
-            children_list.append((child_node.value, child_node.counter, child_node))
+            children_list.append((child_node.value_to_come + child_node.value_to_go, child_node.counter, child_node))
     '''
     dia_child_loc = allowable_moves(curr_node.loc)[1]  # gets allowable diagonal moves
     dia_child_cost = test_node.value + np.sqrt(2)      # diagonal moves cost
@@ -267,14 +272,18 @@ def find_children(curr_node):
     return children_list  # list of all children with a lesser cost for the current node
 
 
-    
+def draw_vector():
+    cv2.arrowedLine(img, curr_node.iloc[0], curr_node.iloc[1], (255, 191, 0), 1)
+    return    
 
 def add_image_frame(curr_node): # A function to add the newly explored state to a frame. This would also update the color based on the cost to come
-    global img, vidWriter
-    img[curr_node.iloc[0], curr_node.iloc[1],0:3] = [0,255,np.min([50 + curr_node.value*2, 255]) ]
-    #cv2.imshow('LaureKaBaal',img)
-    #cv2.waitKey(0)
+    global img, vidWriter, ctr
+    img[curr_node.iloc[0], curr_node.iloc[1],0:3] = [0,255,np.min([50 + curr_node.value_to_come*2, 255]) ]
+    # if ctr == 50:
+    #     draw_vector(curr_node)
+    #     ctr = 0
     vidWriter.write(cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE))
+    # ctr = ctr + 1
     return
     
 
@@ -286,7 +295,7 @@ def solver(curr_node):  # A function to be recursively called to find the djikst
         global l
         if (is_goal(curr_node)):
             find_path(curr_node) # find the path to the start node by tracking the node's parent
-            # print("here")
+            print(curr_node.value_to_come)
             break
         add_image_frame(curr_node)
         children_list = find_children(curr_node) # a function to find possible children and update cost
@@ -309,10 +318,12 @@ if __name__=="__main__":
     global step_size
     global theta
     global trsh
+    global ctr
 
-    step_size = 2
-    theta = 30
     trsh = 2
+    step_size = 1*trsh
+    theta = 30
+    ctr = 0
     node_cnt = 0
     final_path = []
     visitedNode = {}
@@ -355,9 +366,10 @@ if __name__=="__main__":
 
     # create start node belonging to class node
     start_node = node(start_pt,None)
-    start_node.value = 0
+    start_node.value_to_come = 0
+
     global l
-    l = [(start_node.value, start_node.counter, start_node)]
+    l = [(start_node.value_to_come, start_node.counter, start_node)]
 
     # define a priority queue and add first element
     heapq.heapify(l)
