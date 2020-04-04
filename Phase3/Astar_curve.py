@@ -108,7 +108,7 @@ def max_and_min(point_list):
     min_y = min(point_list[:,1])
     return (min_x,min_y),(max_x,max_y)
 
-
+'''
 def define_map(clear_r):  # makes the map according to the assignment
     global a
     global trsh
@@ -138,7 +138,28 @@ def define_map(clear_r):  # makes the map according to the assignment
     if clear_r != 0: # puts in clearance and radius if present
         a.clearance(clear_r)
     return    
+'''
+def define_map(clear_r):
+    global a
+    global trsh
+    a = MapMake(10*trsh, 10*trsh)
+    a.circle_obstacle(5*trsh, 5*trsh, 1*trsh)
+    a.circle_obstacle(7*trsh, 8*trsh, 1*trsh)
+    a.circle_obstacle(3*trsh, 2*trsh, 1*trsh)
+    a.circle_obstacle(7*trsh, 2*trsh, 1*trsh)
 
+    a.triangle_obstacle(([2.25*trsh,8.75*trsh],[3.75*trsh,8.75*trsh],[3.75*trsh,7.25*trsh]))
+    a.triangle_obstacle(([2.25*trsh,8.75*trsh],[2.25*trsh,7.25*trsh],[3.75*trsh,7.25*trsh]))
+
+    a.triangle_obstacle(([0.25*trsh,5.75*trsh],[1.75*trsh,5.75*trsh],[1.75*trsh,4.25*trsh]))
+    a.triangle_obstacle(([0.25*trsh,5.75*trsh],[0.25*trsh,4.25*trsh],[1.75*trsh,4.25*trsh]))
+
+    a.triangle_obstacle(([8.25*trsh,5.75*trsh],[9.75*trsh,5.75*trsh],[9.75*trsh,4.25*trsh]))
+    a.triangle_obstacle(([8.25*trsh,5.75*trsh],[8.25*trsh,4.25*trsh],[9.75*trsh,4.25*trsh]))
+
+    if clear_r != 0: # puts in clearance and radius if present
+        a.clearance(clear_r)
+    return
 
 
 def visualize_map():   # a function to visualize the initial map generated with just obstacles
@@ -292,15 +313,15 @@ if __name__=="__main__":
     global trsh
     global ctr
 
-    trsh = 2
+    trsh = 20
     step_size = 1*trsh
     theta = 30
     ctr = 0
     node_cnt = 0
     final_path = []
     visitedNode = {}
-    vidWriter = cv2.VideoWriter("Astar.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 288, (300*trsh,200*trsh))
-    img = np.zeros([300*trsh,200*trsh,3], dtype=np.uint8)
+    vidWriter = cv2.VideoWriter("Astar.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 288, (10*trsh,100*trsh))
+    img = np.zeros([10*trsh,10*trsh,3], dtype=np.uint8)
     img[:,:,0:3] = [0,255,0]
     # cv2.arrowedLine(img, (50, 50),(100, 100), (255, 144, 30), thickness = 5) 
     # cv2.imshow("try", img)
@@ -316,7 +337,7 @@ if __name__=="__main__":
     t1 = time.time()-define_map_start
     print("Time to define map: " + str(t1))
     solve_problem_start = time.time()
-    # visualize_map()
+    visualize_map()
 
 
     valid_points = False
