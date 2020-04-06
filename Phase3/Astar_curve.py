@@ -179,27 +179,67 @@ def check_round(angle):
         angle = angle - 360
     elif angle < 0:
         angle = angle + 360
-    return angle        
+    return angle
+
+def threshold(angle):
+    global angle_thrsh          # eg: if angle_thrsh = 30 and angle = 316, expected output is 330.  
+    if ( (angle%angle_thrsh - (angle_thrsh/2)) > 0 ):        # if ( 16 - 15 > 0)
+        angle = (angle - angle%angle_thrsh + angle_thrsh)    #   316 - 16 + 30
+    else:
+        angle = angle - angle%angle_thrsh                   
+    return angle         
+
+ def find_pt(x, y, th, Lrpm, Rrpm):
+    global bot_r, bot_L
+    # **********
+    t = 1
+    x_ = x
+    y_ = y
+    th_ = th
+    amove = []
+    move = []
+    while(t>0):
+        x_ += 0.5 * bot_r * ( Lrpm + Rrpm) * np.cos(np.deg2rad(th)) * 0.1
+        y_ += 0.5 * bot_r * ( Lrpm + Rrpm) * np.sin(np.deg2rad(th)) * 0.1
+        th_ += (bot_r/bot_L) * (Rrpm - Lrpm) * 0.1
+        t -= 0.1
+    amove += [x_]
+    amove += [y_]
+    amove += [th_]
+    
+    move += [int(x_)]
+    move += [int(y_]
+    move += [threshold(check_round(th_))]
+    return move         
 
 def allowable_check(point):
-
-    top,t_right,right,b_right,bottom = (point[0]+step_size*np.cos(np.deg2rad(point[2]+2*theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]+2*theta)),check_round(point[2]+2*theta)),\
-                                        (point[0]+step_size*np.cos(np.deg2rad(point[2]+theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]+theta)),check_round(point[2]+theta)),\
-                                        (point[0]+step_size*np.cos(np.deg2rad(point[2])),point[1]+step_size*np.sin(np.deg2rad(point[2])),check_round(point[2])),\
-                                        (point[0]+step_size*np.cos(np.deg2rad(point[2]-theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]-theta)),check_round(point[2]-theta)),\
-                                        (point[0]+step_size*np.cos(np.deg2rad(point[2]-2*theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]-2*theta)),check_round(point[2]-2*theta))
+    global rpm1, rpm2
+    # top,t_right,right,b_right,bottom = (point[0]+step_size*np.cos(np.deg2rad(point[2]+2*theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]+2*theta)),check_round(point[2]+2*theta)),\
+    #                                     (point[0]+step_size*np.cos(np.deg2rad(point[2]+theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]+theta)),check_round(point[2]+theta)),\
+    #                                     (point[0]+step_size*np.cos(np.deg2rad(point[2])),point[1]+step_size*np.sin(np.deg2rad(point[2])),check_round(point[2])),\
+    #                                     (point[0]+step_size*np.cos(np.deg2rad(point[2]-theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]-theta)),check_round(point[2]-theta)),\
+    #                                     (point[0]+step_size*np.cos(np.deg2rad(point[2]-2*theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]-2*theta)),check_round(point[2]-2*theta))
     
-    itop,it_right,iright,ib_right,ibottom = (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]+2*theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]+2*theta)))),check_round(point[2]+2*theta)),\
-                                        (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]+theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]+theta)))),check_round(point[2]+theta)),\
-                                        (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2])))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2])))),check_round(point[2])),\
-                                        (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]-theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]-theta)))),check_round(point[2]-theta)),\
-                                        (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]-2*theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]-2*theta)))),check_round(point[2]-2*theta))
+    # itop,it_right,iright,ib_right,ibottom = (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]+2*theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]+2*theta)))),check_round(point[2]+2*theta)),\
+    #                                     (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]+theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]+theta)))),check_round(point[2]+theta)),\
+    #                                     (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2])))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2])))),check_round(point[2])),\
+    #                                     (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]-theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]-theta)))),check_round(point[2]-theta)),\
+    #                                     (int(round(point[0]+step_size*np.cos(np.deg2rad(point[2]-2*theta)))),int(round(point[1]+step_size*np.sin(np.deg2rad(point[2]-2*theta)))),check_round(point[2]-2*theta))
 
-    
-    test_moves = list((itop,it_right,iright,ib_right,ibottom))
-    actual_moves = list((top,t_right,right,b_right,bottom))
+    amoves = []
+    moves = []
+    amoves, moves  += find_pt(point[0], point[1], point[2], 0, rpm1)
+    amoves, moves  += find_pt(point[0], point[1], point[2], rpm1, 0)
+    amoves, moves  += find_pt(point[0], point[1], point[2], rpm1, rpm1)
+    amoves, moves  += find_pt(point[0], point[1], point[2], 0, rpm2)
+    amoves, moves  += find_pt(point[0], point[1], point[2], rpm2, 0)
+    amoves, moves  += find_pt(point[0], point[1], point[2], rpm2, rpm2)
+    amoves, moves  += find_pt(point[0], point[1], point[2], rpm1, rpm2)
+    amoves, moves  += find_pt(point[0], point[1], point[2], rpm2, rpm1)
+
+    # *******
     allowable_actions = []
-    for move,amove in zip(test_moves,actual_moves):
+    for move,amove in zip(moves,amoves):
         if a.map[move[0],move[1],int(move[2]/30)]==0:  #check if visited
             if a.map.shape[0]>move[0] >=0:              #check if on map X
                 if a.map.shape[1] > move[1] >= 0:       #check if on map Y
@@ -312,6 +352,9 @@ if __name__=="__main__":
     global theta
     global trsh
     global ctr
+    global rpm1, rpm2
+    global bot_r, bot_L
+    global angle_thrsh
 
     trsh = 20
     step_size = 1*trsh
@@ -326,7 +369,10 @@ if __name__=="__main__":
     # cv2.arrowedLine(img, (50, 50),(100, 100), (255, 144, 30), thickness = 5) 
     # cv2.imshow("try", img)
     # cv2.waitKey(0)
-    bot_r = int(input("Enter robot radius: "))
+    rpm1 = int(input("Enter RPM1 for the robot: "))
+    rpm2 = int(input("Enter RPM2 for the robot: "))
+    angle_thrsh = int(360/min(rpm1, rpm2)
+    bot_r = int(input("Enter robot radius (to be harcoded from datasheet): ")) 
     clear_r = int(input("Enter the clearance: "))
     step_size = int(input("Enter step size: "))
     step_size = step_size*trsh
