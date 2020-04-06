@@ -371,7 +371,7 @@ if __name__=="__main__":
     # cv2.waitKey(0)
     rpm1 = int(input("Enter RPM1 for the robot: "))
     rpm2 = int(input("Enter RPM2 for the robot: "))
-    angle_thrsh = int(360/min(rpm1, rpm2)
+    angle_thrsh = int(360/min(rpm1, rpm2))
     bot_r = int(input("Enter robot radius (to be harcoded from datasheet): ")) 
     clear_r = int(input("Enter the clearance: "))
     step_size = int(input("Enter step size: "))
