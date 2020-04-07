@@ -189,7 +189,7 @@ def threshold(angle):
         angle = angle - angle%angle_thrsh                   
     return angle         
 
- def find_pt(x, y, th, Lrpm, Rrpm):
+def find_pt(x, y, th, Lrpm, Rrpm):
     global bot_r, bot_L
     # **********
     t = 1
@@ -208,9 +208,9 @@ def threshold(angle):
     amove += [th_]
     
     move += [int(x_)]
-    move += [int(y_]
+    move += [int(y_)]
     move += [threshold(check_round(th_))]
-    return move         
+    return amove,move         
 
 def allowable_check(point):
     global rpm1, rpm2
@@ -228,6 +228,31 @@ def allowable_check(point):
 
     amoves = []
     moves = []
+    v,w = find_pt(point[0], point[1], point[2], 0, rpm1)
+    amoves += v
+    moves += w
+    v,w = find_pt(point[0], point[1], point[2], rpm1, 0)
+    amoves += v
+    moves += w
+    v,w = find_pt(point[0], point[1], point[2], rpm1, rpm1)
+    amoves += v
+    moves += w
+    v,w = find_pt(point[0], point[1], point[2], 0, rpm2)
+    amoves += v
+    moves += w
+    v,w = find_pt(point[0], point[1], point[2], rpm2, 0)
+    amoves += v
+    moves += w
+    v,w = find_pt(point[0], point[1], point[2], rpm2, rpm2)
+    amoves += v
+    moves += w
+    v,w = find_pt(point[0], point[1], point[2], rpm1, rpm2)
+    amoves += v
+    moves += w
+    v,w = find_pt(point[0], point[1], point[2], rpm2, rpm1)
+    amoves += v
+    moves += w
+    '''
     amoves, moves  += find_pt(point[0], point[1], point[2], 0, rpm1)
     amoves, moves  += find_pt(point[0], point[1], point[2], rpm1, 0)
     amoves, moves  += find_pt(point[0], point[1], point[2], rpm1, rpm1)
@@ -236,10 +261,13 @@ def allowable_check(point):
     amoves, moves  += find_pt(point[0], point[1], point[2], rpm2, rpm2)
     amoves, moves  += find_pt(point[0], point[1], point[2], rpm1, rpm2)
     amoves, moves  += find_pt(point[0], point[1], point[2], rpm2, rpm1)
-
+    '''
     # *******
+    moves = np.reshape(moves,(8,3)).astype(int)
+    amoves = np.reshape(amoves,(8,3)).astype(int)
     allowable_actions = []
     for move,amove in zip(moves,amoves):
+        #print(move[0],move[1],int(move[2]/30))
         if a.map[move[0],move[1],int(move[2]/30)]==0:  #check if visited
             if a.map.shape[0]>move[0] >=0:              #check if on map X
                 if a.map.shape[1] > move[1] >= 0:       #check if on map Y
@@ -282,7 +310,8 @@ def find_path(curr_node): # A function to find the path until the root by tracki
 def find_children(curr_node):
     test_node = curr_node
 
-    child_loc = allowable_check(curr_node.loc)  # gets allowable cardinal moves
+    child_loc = allowable_check(curr_node.loc)
+    # gets allowable cardinal moves
     child_cost_to_come = test_node.value_to_come + step_size            # square move cost
     # print (child_cost_to_come)
     children_list = []
@@ -369,32 +398,37 @@ if __name__=="__main__":
     # cv2.arrowedLine(img, (50, 50),(100, 100), (255, 144, 30), thickness = 5) 
     # cv2.imshow("try", img)
     # cv2.waitKey(0)
-    rpm1 = int(input("Enter RPM1 for the robot: "))
-    rpm2 = int(input("Enter RPM2 for the robot: "))
+    rpm1,rpm2,robot_r,clear_r,step_size,theta = 5,10,1,1,1,30
+    #rpm1 = int(input("Enter RPM1 for the robot: "))
+    #rpm2 = int(input("Enter RPM2 for the robot: "))
     angle_thrsh = int(360/min(rpm1, rpm2))
-    bot_r = int(input("Enter robot radius (to be harcoded from datasheet): ")) 
-    clear_r = int(input("Enter the clearance: "))
-    step_size = int(input("Enter step size: "))
+    #robot_r = int(input("Enter robot radius (to be harcoded from datasheet): ")) 
+
+    bot_r = 0.038
+    bot_L = 0.354
+    #clear_r = int(input("Enter the clearance: "))
+    #step_size = int(input("Enter step size: "))
     step_size = step_size*trsh
-    theta = int(input("Enter start orientation in degrees: "))
-    total_clear = bot_r+clear_r
+    #theta = int(input("Enter start orientation in degrees: "))
+    total_clear = robot_r+clear_r
     define_map_start = time.time()
     define_map(total_clear)
     t1 = time.time()-define_map_start
     print("Time to define map: " + str(t1))
     solve_problem_start = time.time()
-    visualize_map()
+    #visualize_map()
 
-
+    start_pt = [1,1]
+    end_pt = [2,2]
     valid_points = False
     while  valid_points == False:
-        start_pt = (input("Enter start point in form # #: "))
-        start_pt = [int(start_pt.split()[0]), int(start_pt.split()[1])]
+        #start_pt = (input("Enter start point in form # #: "))
+        #start_pt = [int(start_pt.split()[0]), int(start_pt.split()[1])]
         start_pt = [trsh*start_pt[0], trsh*start_pt[1], theta ]
         img[start_pt[0]][start_pt[1]][0:3] = [0,0,0]
 
-        end_pt = (input("Enter end point in form # # : "))
-        end_pt = [trsh*int(end_pt.split()[0]), trsh*int(end_pt.split()[1]), 0]
+        #end_pt = (input("Enter end point in form # # : "))
+        #end_pt = [trsh*int(end_pt.split()[0]), trsh*int(end_pt.split()[1]), 0]
             # print (end_pt)
         img[end_pt[0]][end_pt[1]][0:3] = [0,0,255]
         if(point_in_obstacle(start_pt) or point_in_obstacle(end_pt)): # check if either the start or end node an obstacle
@@ -402,7 +436,7 @@ if __name__=="__main__":
             continue
         else:
             valid_points = True
-
+    
     a.map[start_pt[0], start_pt[1], 1] = 0
 
     # create start node belonging to class node
