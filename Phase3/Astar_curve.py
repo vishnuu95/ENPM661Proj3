@@ -213,7 +213,7 @@ def find_pt(x, y, th, Lrpm, Rrpm):
     return amove,move         
 
 def allowable_check(point):
-    global rpm1, rpm2
+    global rpm1, rpm2, angle_thrsh
     # top,t_right,right,b_right,bottom = (point[0]+step_size*np.cos(np.deg2rad(point[2]+2*theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]+2*theta)),check_round(point[2]+2*theta)),\
     #                                     (point[0]+step_size*np.cos(np.deg2rad(point[2]+theta)),point[1]+step_size*np.sin(np.deg2rad(point[2]+theta)),check_round(point[2]+theta)),\
     #                                     (point[0]+step_size*np.cos(np.deg2rad(point[2])),point[1]+step_size*np.sin(np.deg2rad(point[2])),check_round(point[2])),\
@@ -268,7 +268,7 @@ def allowable_check(point):
     allowable_actions = []
     for move,amove in zip(moves,amoves):
         #print(move[0],move[1],int(move[2]/30))
-        if a.map[move[0],move[1],int(move[2]/30)]==0:  #check if visited
+        if a.map[move[0],move[1],int(move[2]/angle_thrsh)]==0:  #check if visited
             if a.map.shape[0]>move[0] >=0:              #check if on map X
                 if a.map.shape[1] > move[1] >= 0:       #check if on map Y
                   if a.map[move[0],move[1],12] == 0:    #check if obstacle
@@ -312,12 +312,13 @@ def find_children(curr_node):
 
     child_loc = allowable_check(curr_node.loc)
     # gets allowable cardinal moves
+    print(len(child_loc))
     child_cost_to_come = test_node.value_to_come + step_size            # square move cost
     # print (child_cost_to_come)
     children_list = []
     for state_loc in child_loc:
         go_cost = math.sqrt((state_loc[0]-end_pt[0])**2 + (state_loc[1]-end_pt[1])**2)
-        # print (go_cost)
+        child_cost_to_come = math.sqrt((state_loc[0]-curr_node.loc[0])**2 + (state_loc[1]-curr_node.loc[1])**2)
         if (a.map[int(state_loc[0])][int(state_loc[1])][13] + a.map[int(state_loc[0])][int(state_loc[1])][14] > child_cost_to_come + go_cost):  # if the child cost is less from the current node
             # print("2")
             a.map[int(state_loc[0])][int(state_loc[1])][13] = child_cost_to_come              # update map node to lesser cost
@@ -327,14 +328,14 @@ def find_children(curr_node):
     
     return children_list  # list of all children with a lesser cost for the current node
 
-
+'''
 def draw_vector(curr_node):
     global step_size
     # print(curr_node.iloc[2])
     cv2.arrowedLine(img, (curr_node.iloc[1], curr_node.iloc[0]),
     ( int(curr_node.iloc[1]+3*step_size*np.sin(np.deg2rad(curr_node.iloc[2]))), int(curr_node.iloc[0]+3*step_size*np.cos(np.deg2rad(curr_node.iloc[2])))), (255, 144, 30))
     return    
-
+'''
 def add_image_frame(curr_node): # A function to add the newly explored state to a frame. This would also update the color based on the cost to come
     global img, vidWriter, ctr
     img[curr_node.iloc[0], curr_node.iloc[1],0:3] = [0,255,np.min([50 + curr_node.value_to_come*2, 255]) ]
@@ -386,7 +387,7 @@ if __name__=="__main__":
     global angle_thrsh
 
     trsh = 20
-    step_size = 1*trsh
+    #step_size = 1*trsh
     theta = 30
     ctr = 0
     node_cnt = 0
@@ -398,7 +399,7 @@ if __name__=="__main__":
     # cv2.arrowedLine(img, (50, 50),(100, 100), (255, 144, 30), thickness = 5) 
     # cv2.imshow("try", img)
     # cv2.waitKey(0)
-    rpm1,rpm2,robot_r,clear_r,step_size,theta = 5,10,1,1,1,30
+    rpm1,rpm2,robot_r,clear_r,theta = 5,10,1,1,30
     #rpm1 = int(input("Enter RPM1 for the robot: "))
     #rpm2 = int(input("Enter RPM2 for the robot: "))
     angle_thrsh = int(360/min(rpm1, rpm2))
@@ -408,7 +409,7 @@ if __name__=="__main__":
     bot_L = 0.354
     #clear_r = int(input("Enter the clearance: "))
     #step_size = int(input("Enter step size: "))
-    step_size = step_size*trsh
+    #step_size = step_size*trsh
     #theta = int(input("Enter start orientation in degrees: "))
     total_clear = robot_r+clear_r
     define_map_start = time.time()
