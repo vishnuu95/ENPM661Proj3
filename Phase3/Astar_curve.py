@@ -12,11 +12,11 @@ sys.setrecursionlimit(10**9)
 class node:
     
     def __init__(self, location, parent):
-        global a, node_cnt
+        global a, node_cnt,angle_thrsh
         self.loc = location
         self.iloc = [int(round(location[0])), int(round(location[1])), int(round(location[2]))]
-        self.value_to_come = a.map[int(location[0])][int(location[1])][13]
-        self.value_to_go = a.map[int(location[0])][int(location[1])][14]
+        self.value_to_come = a.map[int(location[0])][int(location[1])][angle_thrsh+2]
+        self.value_to_go = a.map[int(location[0])][int(location[1])][angle_thrsh+3]
         self.parent = parent
         self.counter = node_cnt
         node_cnt += 1
@@ -25,17 +25,18 @@ class node:
 class MapMake:
 
     def __init__(self, width_x, length_y):
+        global angle_thrsh
         self.width_x = width_x
         self.length_y = length_y
-        self.map = np.zeros([width_x, length_y, 15])
-        self.map[:,:, 13] = np.inf                   # last element stores the cost to come
-        self.map[:,:,14] = np.inf                    # last element stores the cost to go
+        self.map = np.zeros([width_x, length_y, angle_thrsh+4])
+        self.map[:,:, angle_thrsh+2] = np.inf                   # last element stores the cost to come
+        self.map[:,:,angle_thrsh+3] = np.inf                    # last element stores the cost to go
 
     def circle_obstacle(self, xpos, ypos, radius):  # makes a circle obstacle
         for i in np.arange(xpos-radius,xpos+radius,1):
             for j in np.arange(ypos-radius,ypos+radius,1):
                 if np.sqrt(np.square(ypos - j) + np.square(xpos - i)) <= radius:
-                    self.map[i, j, 12] = 1
+                    self.map[i, j, angle_thrsh+1] = 1
                     img[i,j,0:3] = [0,0,255]
 
     def oval_obstacle(self, xpos, ypos, radius_x, radius_y):  # makes oval obstacle
@@ -44,7 +45,7 @@ class MapMake:
                 first_oval_term = np.square(i - xpos) / np.square(radius_x)
                 second_oval_term = np.square(j - ypos) / np.square(radius_y)
                 if first_oval_term + second_oval_term <= 1:
-                    self.map[i, j, 12] = 1
+                    self.map[i, j, angle_thrsh+1] = 1
                     img[i,j,0:3] = [0,0,255]
 
     def triangle_obstacle(self,three_points): # makes triangle obstacle
@@ -62,22 +63,22 @@ class MapMake:
                 pos = (d1 > 0) or (d2 > 0) or (d3 > 0)
 
                 if not (neg and pos):
-                    a.map[int(i)][int(j)][12] = 1
+                    a.map[int(i)][int(j)][angle_thrsh+1] = 1
                     img[int(i), int(j), 0:3] = [0, 0, 255]
 
     def clearance(self, clearance_distance):
 
-        self.map[self.width_x-clearance_distance:self.width_x,:,12] = 2  # makes edge clearance in map
-        self.map[0:clearance_distance,:,12] = 2
-        self.map[:, 0:clearance_distance, 12] = 2
-        self.map[:, self.length_y-clearance_distance:self.length_y, 12] = 2
+        self.map[self.width_x-clearance_distance:self.width_x,:,angle_thrsh+1] = 2  # makes edge clearance in map
+        self.map[0:clearance_distance,:,angle_thrsh+1] = 2
+        self.map[:, 0:clearance_distance, angle_thrsh+1] = 2
+        self.map[:, self.length_y-clearance_distance:self.length_y, angle_thrsh+1] = 2
 
         img[0:clearance_distance, :, 0:3] = [0, 69, 200]                 # makes edge clearance in image
         img[self.width_x-clearance_distance:self.width_x, :, 0:3] = [0, 69, 200]
         img[:, 0:clearance_distance, 0:3] = [0, 69, 200]
         img[:, self.length_y-clearance_distance:self.length_y, 0:3] = [0, 69, 200]
 
-        obstacles = np.where(self.map[:, :, 12] == 1)
+        obstacles = np.where(self.map[:, :, angle_thrsh+1] == 1)
         obstacles = np.array(obstacles)
         obstacles = obstacles.T  # get all points that are in obstacles
 
@@ -91,8 +92,8 @@ class MapMake:
         for obstacle_point in obstacles:
             bound_list = obstacle_point+circle_list
             for bound in bound_list:
-                if a.map[bound[0], bound[1],12] == 0:
-                    a.map[bound[0], bound[1],12] = 2
+                if a.map[bound[0], bound[1],angle_thrsh+1] == 0:
+                    a.map[bound[0], bound[1],angle_thrsh+1] = 2
                     img[bound[0], bound[1], 0:3] = [0, 69, 200]
 
 
@@ -190,7 +191,7 @@ def threshold(angle):
     return angle         
 
 def find_pt(x, y, th, Lrpm, Rrpm):
-    global bot_r, bot_L
+    global bot_r, bot_L,trsh
     # **********
     t = 1
     x_ = x
@@ -199,8 +200,8 @@ def find_pt(x, y, th, Lrpm, Rrpm):
     amove = []
     move = []
     while(t>0):
-        x_ += 0.5 * bot_r * ( Lrpm + Rrpm) * np.cos(np.deg2rad(th)) * 0.1
-        y_ += 0.5 * bot_r * ( Lrpm + Rrpm) * np.sin(np.deg2rad(th)) * 0.1
+        x_ += trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.cos(np.deg2rad(th_)) * 0.1)
+        y_ += trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.sin(np.deg2rad(th_)) * 0.1)
         th_ += (bot_r/bot_L) * (Rrpm - Lrpm) * 0.1
         t -= 0.1
     amove += [x_]
@@ -265,13 +266,14 @@ def allowable_check(point):
     # *******
     moves = np.reshape(moves,(8,3)).astype(int)
     amoves = np.reshape(amoves,(8,3)).astype(int)
+    #print(moves)
     allowable_actions = []
     for move,amove in zip(moves,amoves):
-        #print(move[0],move[1],int(move[2]/30))
+        #print(move[0],move[1],int(move[2]/angle_thrsh))
         if a.map[move[0],move[1],int(move[2]/angle_thrsh)]==0:  #check if visited
             if a.map.shape[0]>move[0] >=0:              #check if on map X
                 if a.map.shape[1] > move[1] >= 0:       #check if on map Y
-                  if a.map[move[0],move[1],12] == 0:    #check if obstacle
+                  if a.map[move[0],move[1],angle_thrsh+1] == 0:    #check if obstacle
 
                     allowable_actions.append(amove)  
 
@@ -281,7 +283,7 @@ def allowable_check(point):
 def is_goal(curr_node):              # checks if the current node is also the goal
     #if curr_node.loc[0] == end_pt[0] and curr_node.loc[1] == end_pt[1]:
     #    return True
-    if (curr_node.loc[0]-end_pt[0])**2 + (curr_node.loc[1]-end_pt[1])**2 < 2.25:
+    if (curr_node.loc[0]-end_pt[0])**2 + (curr_node.loc[1]-end_pt[1])**2 < 10:
         return True
 
 
@@ -309,20 +311,20 @@ def find_path(curr_node): # A function to find the path until the root by tracki
 
 def find_children(curr_node):
     test_node = curr_node
-
     child_loc = allowable_check(curr_node.loc)
     # gets allowable cardinal moves
-    print(len(child_loc))
-    child_cost_to_come = test_node.value_to_come + step_size            # square move cost
+    #print(len(child_loc))
+    #child_cost_to_come = test_node.value_to_come + step_size            # square move cost
     # print (child_cost_to_come)
     children_list = []
     for state_loc in child_loc:
+        #print(state_loc,curr_node.loc)
         go_cost = math.sqrt((state_loc[0]-end_pt[0])**2 + (state_loc[1]-end_pt[1])**2)
         child_cost_to_come = math.sqrt((state_loc[0]-curr_node.loc[0])**2 + (state_loc[1]-curr_node.loc[1])**2)
-        if (a.map[int(state_loc[0])][int(state_loc[1])][13] + a.map[int(state_loc[0])][int(state_loc[1])][14] > child_cost_to_come + go_cost):  # if the child cost is less from the current node
+        if (a.map[int(state_loc[0])][int(state_loc[1])][angle_thrsh+2] + a.map[int(state_loc[0])][int(state_loc[1])][angle_thrsh+3] > child_cost_to_come + go_cost):  # if the child cost is less from the current node
             # print("2")
-            a.map[int(state_loc[0])][int(state_loc[1])][13] = child_cost_to_come              # update map node to lesser cost
-            a.map[int(state_loc[0])][int(state_loc[1])][14] = go_cost
+            a.map[int(state_loc[0])][int(state_loc[1])][angle_thrsh+2] = child_cost_to_come              # update map node to lesser cost
+            a.map[int(state_loc[0])][int(state_loc[1])][angle_thrsh+3] = go_cost
             child_node = node(state_loc,curr_node)              # create new child node
             children_list.append((child_node.value_to_come + child_node.value_to_go, child_node.counter, child_node))
     
@@ -339,7 +341,6 @@ def draw_vector(curr_node):
 def add_image_frame(curr_node): # A function to add the newly explored state to a frame. This would also update the color based on the cost to come
     global img, vidWriter, ctr
     img[curr_node.iloc[0], curr_node.iloc[1],0:3] = [0,255,np.min([50 + curr_node.value_to_come*2, 255]) ]
-    
     # if ctr == 40:
     #     draw_vector(curr_node)
     #     ctr = 0
@@ -353,7 +354,7 @@ def add_image_frame(curr_node): # A function to add the newly explored state to 
 def solver(curr_node):  # A function to be recursively called to find the djikstra solution
     while(1):
         #visitedNode.update({curr_node: "s"})
-        a.map[curr_node.iloc[0],curr_node.iloc[1],int(curr_node.iloc[2]/30)]=1
+        a.map[curr_node.iloc[0],curr_node.iloc[1],int(curr_node.iloc[2]/angle_thrsh)]=1
 
         global l
         if (is_goal(curr_node)):
@@ -388,7 +389,7 @@ if __name__=="__main__":
 
     trsh = 20
     #step_size = 1*trsh
-    theta = 30
+    #theta = 30
     ctr = 0
     node_cnt = 0
     final_path = []
@@ -399,14 +400,14 @@ if __name__=="__main__":
     # cv2.arrowedLine(img, (50, 50),(100, 100), (255, 144, 30), thickness = 5) 
     # cv2.imshow("try", img)
     # cv2.waitKey(0)
-    rpm1,rpm2,robot_r,clear_r,theta = 5,10,1,1,30
+    rpm1,rpm2,robot_r,clear_r,theta = 5,10,1,1,45
     #rpm1 = int(input("Enter RPM1 for the robot: "))
     #rpm2 = int(input("Enter RPM2 for the robot: "))
-    angle_thrsh = int(360/min(rpm1, rpm2))
     #robot_r = int(input("Enter robot radius (to be harcoded from datasheet): ")) 
-
     bot_r = 0.038
     bot_L = 0.354
+    angle_thrsh = int(360/min(rpm1, rpm2))
+    #print(angle_thrsh)
     #clear_r = int(input("Enter the clearance: "))
     #step_size = int(input("Enter step size: "))
     #step_size = step_size*trsh
@@ -427,7 +428,7 @@ if __name__=="__main__":
         #start_pt = [int(start_pt.split()[0]), int(start_pt.split()[1])]
         start_pt = [trsh*start_pt[0], trsh*start_pt[1], theta ]
         img[start_pt[0]][start_pt[1]][0:3] = [0,0,0]
-
+        end_pt = [trsh*end_pt[0], trsh*end_pt[1], 0 ]
         #end_pt = (input("Enter end point in form # # : "))
         #end_pt = [trsh*int(end_pt.split()[0]), trsh*int(end_pt.split()[1]), 0]
             # print (end_pt)
@@ -439,7 +440,7 @@ if __name__=="__main__":
             valid_points = True
     
     a.map[start_pt[0], start_pt[1], 1] = 0
-
+    print(end_pt)
     # create start node belonging to class node
     start_node = node(start_pt,None)
     start_node.value_to_come = 0
