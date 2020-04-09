@@ -394,7 +394,7 @@ if __name__=="__main__":
     node_cnt = 0
     final_path = []
     visitedNode = {}
-    vidWriter = cv2.VideoWriter("Astar.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 288, (10*trsh,100*trsh))
+    vidWriter = cv2.VideoWriter("Astar.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 288, (10*trsh,10*trsh))
     img = np.zeros([10*trsh,10*trsh,3], dtype=np.uint8)
     img[:,:,0:3] = [0,255,0]
     # cv2.arrowedLine(img, (50, 50),(100, 100), (255, 144, 30), thickness = 5) 
