@@ -172,78 +172,98 @@ def find_pt(x, y, th, Lrpm, Rrpm):
     th_ = th
     amove = []
     move = []
+    cost = 0
+    Lrpm = (Lrpm*2*np.pi)/60
+    Rrpm = (Rrpm*2*np.pi)/60
     while(t>0):
         x_ += trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.cos(np.deg2rad(th_)) * 0.1)
         y_ += trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.sin(np.deg2rad(th_)) * 0.1)
         th_ += (180/np.pi)*((bot_r/bot_L) * (Rrpm - Lrpm) * 0.1)
         t -= 0.1
-    amove += [x_]
-    amove += [y_]
-    amove += [threshold(check_round(th_))] # ------->>>>>>>>>>
+        # cost += np.sqrt((trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.cos(np.deg2rad(th_)) * 0.1))**2 + (trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.sin(np.deg2rad(th_)) * 0.1))**2)
+
+    # print(x - x_)
+    # print(y - y_)    
+    # input()
+    amove += [(x_)]
+    amove += [(y_)]
+    amove += [(check_round(th_))] # ------->>>>>>>>>>
     
     move += [int(round(x_))]
     move += [int(round(y_))]
     move += [threshold(check_round(th_))]
-    # print (amove, move)
-    # input()
+    print (amove, move)
+    input()
     # print (amove)
-    return amove,move         
+    return amove,move#,cost         
 
 def allowable_check(point):
     global a,rpm1, rpm2, angle_thrsh, angle_res
-
+    # cost = []
     amoves = []
     moves = []
     v,w = find_pt(point[0], point[1], point[2], 0, rpm1)
     amoves += v
     moves += w
+    # cost.append(c)
     v,w = find_pt(point[0], point[1], point[2], rpm1, 0)
     amoves += v
     moves += w
+    # cost.append(c)
     v,w = find_pt(point[0], point[1], point[2], rpm1, rpm1)
     amoves += v
     moves += w
+    # cost.append(c)
     v,w = find_pt(point[0], point[1], point[2], 0, rpm2)
     amoves += v
     moves += w
+    # cost.append(c)
     v,w = find_pt(point[0], point[1], point[2], rpm2, 0)
     amoves += v
     moves += w
+    # cost.append(c)
     v,w = find_pt(point[0], point[1], point[2], rpm2, rpm2)
     amoves += v
     moves += w
+    # cost.append(c)
     v,w = find_pt(point[0], point[1], point[2], rpm1, rpm2)
     amoves += v
     moves += w
+    # cost.append(c)
     v,w = find_pt(point[0], point[1], point[2], rpm2, rpm1)
     amoves += v
     moves += w
+    # cost.append(c)
 
     # *******
     moves = np.reshape(moves,(8,3)).astype(int)
     amoves = np.reshape(amoves,(8,3))
+    # cost = np.asarray(cost)
     #print(moves)
     allowable_actions = []
+    # allowable_cost = []
     for move,amove in zip(moves,amoves):
         #print(move[0],move[1],int(move[2]/angle_thrsh))
         # print(int(move[2]/angle_res))
         # print(move[0], move[1], int(round(move[2]/angle_res)),a.map[move[0],move[1],int(round(move[2]/angle_res))], "allowable")
-        print(move[0],move[1],int(round(move[2]/angle_res)), a.map[move[0],move[1],int(round(move[2]/angle_res))])
+        print(move[0],move[1],int(round(move[2]/angle_res)), a.map[move[0],move[1])])
 
         if a.map[move[0],move[1],int(round(move[2]/angle_res))]==0:  #check if visited
             print("done")
             if a.map.shape[0]>move[0] >=0:              #check if on map X
                 if a.map.shape[1] > move[1] >= 0:       #check if on map Y
                     if a.map[move[0],move[1],angle_thrsh] == 0:    #check if obstacle
-                        allowable_actions.append(amove)  
+                        allowable_actions.append(amove)
+                        # allowable_cost.append(ct)  
 
     # print((allowable_actions))
     return allowable_actions
 
 def is_goal(curr_node):              # checks if the current node is also the goal
+    global trsh
     #if curr_node.loc[0] == end_pt[0] and curr_node.loc[1] == end_pt[1]:
     #    return True
-    if (curr_node.loc[0]-end_pt[0])**2 + (curr_node.loc[1]-end_pt[1])**2 < 10:
+    if (curr_node.loc[0]-end_pt[0])**2 + (curr_node.loc[1]-end_pt[1])**2 < trsh:
         return True
 
 
@@ -275,15 +295,16 @@ def find_children(curr_node):
     #child_cost_to_come = test_node.value_to_come + step_size            # square move cost
     # print (child_cost_to_come)
     children_list = []
-    for i,state_loc in enumerate(child_loc):
+    for i,(state_loc) in enumerate((child_loc)):
         #print(state_loc,curr_node.loc)
         go_cost = math.sqrt((state_loc[0]-end_pt[0])**2 + (state_loc[1]-end_pt[1])**2)
         child_cost_to_come = math.sqrt((state_loc[0]-curr_node.loc[0])**2 + (state_loc[1]-curr_node.loc[1])**2)
+        # child_cost_to_come = state_cost
         # print(i, a.map[int(state_loc[0])][int(state_loc[1])][angle_thrsh+2] + a.map[int(state_loc[0])][int(state_loc[1])][angle_thrsh+3])
         # print(i, state_loc[0], state_loc[1])
         # print(i, child_cost_to_come + go_cost)
         # input()
-        if (a.map[int(round(state_loc[0]))][int(round(state_loc[1]))][angle_thrsh+1] + a.map[int(round(state_loc[0]))][int(round(state_loc[1]))][angle_thrsh+2] >= child_cost_to_come + go_cost):  # if the child cost is less from the current node
+        if (a.map[int(round(state_loc[0]))][int(round(state_loc[1]))][angle_thrsh+1] + a.map[int(round(state_loc[0]))][int(round(state_loc[1]))][angle_thrsh+2] > child_cost_to_come + go_cost):  # if the child cost is less from the current node
             # print("2")
             a.map[int(round(state_loc[0]))][int(round(state_loc[1]))][angle_thrsh+1] = child_cost_to_come              # update map node to lesser cost
             a.map[int(round(state_loc[0]))][int(round(state_loc[1]))][angle_thrsh+2] = go_cost
@@ -308,7 +329,7 @@ def which_move(idx):
 
 def add_image_frame(curr_node): # A function to add the newly explored state to a frame. This would also update the color based on the cost to come
     global img, vidWriter, ctr
-    img[curr_node.iloc[0], curr_node.iloc[1],0:3] = [0,255,np.min([200 + curr_node.value_to_come*2, 255]) ]
+    img[curr_node.iloc[0], curr_node.iloc[1],0:3] = [0,0, 255] #np.min([200 + curr_node.value_to_come*2, 255])
     # if ctr == 40:
     #     draw_vector(curr_node)
     #     ctr = 0
@@ -363,32 +384,27 @@ if __name__=="__main__":
     global angle_thrsh, angle_res
     global a
 
-    trsh = 20
+    trsh = 100
     #step_size = 1*trsh
     #theta = 30
     ctr = 0
     node_cnt = 0
     final_path = []
     visitedNode = {}
-<<<<<<< HEAD
     vidWriter = cv2.VideoWriter("Astar.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 24, (10*trsh,10*trsh)) # --->>>
-=======
-    vidWriter = cv2.VideoWriter("Astar.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 288, (10*trsh,10*trsh))
-
->>>>>>> c11c647e84f43e23d89e0f6fb75cef7e98d83343
     img = np.zeros([10*trsh,10*trsh,3], dtype=np.uint8)
     img[:,:,0:3] = [0,255,0]
     # cv2.arrowedLine(img, (50, 50),(100, 100), (255, 144, 30), thickness = 5) 
     # cv2.imshow("try", img)
     # cv2.waitKey(0)
-    rpm1,rpm2,robot_r,clear_r,theta = 5,5,1,1,0
+    rpm1,rpm2,robot_r,clear_r,theta = 40,50,1,1,0
     #rpm1 = int(input("Enter RPM1 for the robot: "))
     #rpm2 = int(input("Enter RPM2 for the robot: "))
     #robot_r = int(input("Enter robot radius (to be harcoded from datasheet): ")) 
     bot_r = 0.038
     bot_L = 0.354
-    angle_thrsh = int(360/15)
-    angle_res = 15
+    angle_thrsh = int(360/1)
+    angle_res = 1
     # angle_thrsh = int(360/angle_res)
     print (angle_thrsh)
     print ( angle_res)
@@ -411,7 +427,7 @@ if __name__=="__main__":
     while  valid_points == False:
         #start_pt = (input("Enter start point in form # #: "))
         #start_pt = [int(start_pt.split()[0]), int(start_pt.split()[1])]
-        
+        theta = 0
         start_pt = [int(trsh*start_pt[0]), int(trsh*start_pt[1]), theta ]
         img[start_pt[0]][start_pt[1]][0:3] = [0,0,0]
         end_pt = [int(trsh*end_pt[0]), int(trsh*end_pt[1]), 0 ]
