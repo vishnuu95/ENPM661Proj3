@@ -15,9 +15,9 @@ class node:
         global a, node_cnt,angle_thrsh
         self.loc = location
         self.iloc = [int(round(location[0])), int(round(location[1])), threshold(check_round(location[2]))]
-        self.value_to_come = a.map[int(location[0])][int(location[1])][angle_thrsh+1]
-        self.value_to_go = a.map[int(location[0])][int(location[1])][angle_thrsh+2]
-        self.act_to_reach = move
+        self.value_to_come = a.map[int(round(location[0]))][int(round(location[1]))][angle_thrsh+1]
+        self.value_to_go = a.map[int(round(location[0]))][int(round(location[1]))][angle_thrsh+2]
+        self.move = move
         self.parent = parent
         self.counter = node_cnt
         node_cnt += 1
@@ -192,8 +192,8 @@ def find_pt(x, y, th, Lrpm, Rrpm):
     move += [int(round(x_))]
     move += [int(round(y_))]
     move += [threshold(check_round(th_))]
-    print (amove, move)
-    input()
+    # print (amove, move)
+    # input()
     # print (amove)
     return amove,move#,cost         
 
@@ -214,11 +214,11 @@ def allowable_check(point):
     amoves += v
     moves += w
     # cost.append(c)
-    v,w = find_pt(point[0], point[1], point[2], 0, rpm2)
+    v,w = find_pt(point[0], point[1], point[2], rpm2, 0)
     amoves += v
     moves += w
     # cost.append(c)
-    v,w = find_pt(point[0], point[1], point[2], rpm2, 0)
+    v,w = find_pt(point[0], point[1], point[2], 0, rpm2)
     amoves += v
     moves += w
     # cost.append(c)
@@ -238,26 +238,29 @@ def allowable_check(point):
     # *******
     moves = np.reshape(moves,(8,3)).astype(int)
     amoves = np.reshape(amoves,(8,3))
+    idxs = np.arange(8)
     # cost = np.asarray(cost)
     #print(moves)
     allowable_actions = []
+    allowable_ids = []
     # allowable_cost = []
-    for move,amove in zip(moves,amoves):
+    for move,amove, idx in zip(moves,amoves, idxs):
         #print(move[0],move[1],int(move[2]/angle_thrsh))
         # print(int(move[2]/angle_res))
         # print(move[0], move[1], int(round(move[2]/angle_res)),a.map[move[0],move[1],int(round(move[2]/angle_res))], "allowable")
-        print(move[0],move[1],int(round(move[2]/angle_res)), a.map[move[0],move[1])])
+        # print(move[0],move[1],int(round(move[2]/angle_res), a.map[move[0],move[1]]))
 
         if a.map[move[0],move[1],int(round(move[2]/angle_res))]==0:  #check if visited
-            print("done")
+            # print("done")
             if a.map.shape[0]>move[0] >=0:              #check if on map X
                 if a.map.shape[1] > move[1] >= 0:       #check if on map Y
                     if a.map[move[0],move[1],angle_thrsh] == 0:    #check if obstacle
                         allowable_actions.append(amove)
+                        allowable_ids.append(idx)
                         # allowable_cost.append(ct)  
 
     # print((allowable_actions))
-    return allowable_actions
+    return allowable_actions, allowable_ids
 
 def is_goal(curr_node):              # checks if the current node is also the goal
     global trsh
@@ -276,12 +279,16 @@ def find_path(curr_node): # A function to find the path until the root by tracki
     # print (final_path)    
     for i, value in enumerate(final_path):
         img[value.iloc[0], value.iloc[1], 0:3] = [255,0,0]
-        # cv2.arrowedLine(img, (prev.iloc[1], prev.iloc[0]),(curr.iloc[1], curr.iloc[0]), (255, 144, 30), thickness=3)   
-        # cv2.imshow("try", cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE))
-        # cv2.waitKey(0)
+        action = 0
+        curr = value
+        action  = curr.move
+        if i !=0:
+            nodes_file.write(str(prev_loc[0])+ "," + str(prev_loc[1]) + "," + str(prev_loc[2]) + "," + str(action) + "\n" )
+        prev_loc = curr.loc
+        
         for j in range(3):
             vidWriter.write(cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE))
-
+    nodes_file.close()
     vidWriter.release()         
     return
 
@@ -289,26 +296,29 @@ def find_path(curr_node): # A function to find the path until the root by tracki
 def find_children(curr_node):
     global a
     test_node = curr_node
-    child_loc = allowable_check(curr_node.loc)
+    child_loc, ids = allowable_check(curr_node.loc)
     # gets allowable cardinal moves
-    #print(len(child_loc))
+    # print(len(child_loc))
     #child_cost_to_come = test_node.value_to_come + step_size            # square move cost
     # print (child_cost_to_come)
     children_list = []
-    for i,(state_loc) in enumerate((child_loc)):
+    for idx, state_loc in zip(ids, child_loc):
         #print(state_loc,curr_node.loc)
         go_cost = math.sqrt((state_loc[0]-end_pt[0])**2 + (state_loc[1]-end_pt[1])**2)
         child_cost_to_come = math.sqrt((state_loc[0]-curr_node.loc[0])**2 + (state_loc[1]-curr_node.loc[1])**2)
         # child_cost_to_come = state_cost
         # print(i, a.map[int(state_loc[0])][int(state_loc[1])][angle_thrsh+2] + a.map[int(state_loc[0])][int(state_loc[1])][angle_thrsh+3])
-        # print(i, state_loc[0], state_loc[1])
-        # print(i, child_cost_to_come + go_cost)
+        # print( i, state_loc[0], state_loc[1], child_cost_to_come, go_cost )
+        
         # input()
-        if (a.map[int(round(state_loc[0]))][int(round(state_loc[1]))][angle_thrsh+1] + a.map[int(round(state_loc[0]))][int(round(state_loc[1]))][angle_thrsh+2] > child_cost_to_come + go_cost):  # if the child cost is less from the current node
-            # print("2")
+        if (a.map[int(round(state_loc[0]))][int(round(state_loc[1]))][angle_thrsh+1] + a.map[int(round(state_loc[0]))][int(round(state_loc[1]))][angle_thrsh+2] >= child_cost_to_come + go_cost):  # if the child cost is less from the current node
+            # print(i)
             a.map[int(round(state_loc[0]))][int(round(state_loc[1]))][angle_thrsh+1] = child_cost_to_come              # update map node to lesser cost
             a.map[int(round(state_loc[0]))][int(round(state_loc[1]))][angle_thrsh+2] = go_cost
-            child_node = node(state_loc,curr_node, which_move(i))              # create new child node
+            # print(which_move(idx))
+            # input()
+            child_node = node(state_loc,curr_node, which_move(idx))              # create new child node
+            # print("a*", child_node.value_to_come ,child_node.value_to_go, state_loc[0], state_loc[1], state_loc[2])
             children_list.append((child_node.value_to_come + child_node.value_to_go, child_node.counter, child_node))
     # print(len(children_list))
     return children_list  # list of all children with a lesser cost for the current node
@@ -319,8 +329,8 @@ def which_move(idx):
         0 : (0, rpm1), 
         1 : (rpm1, 0),
         2 : (rpm1, rpm1),
-        3 : (0, rpm2),
-        4 : (rpm2, 0),
+        3 : (rpm2, 0),
+        4 : (0, rpm2),
         5 : (rpm2, rpm2),
         6 : (rpm1, rpm2),
         7 : (rpm2, rpm1)
@@ -329,7 +339,7 @@ def which_move(idx):
 
 def add_image_frame(curr_node): # A function to add the newly explored state to a frame. This would also update the color based on the cost to come
     global img, vidWriter, ctr
-    img[curr_node.iloc[0], curr_node.iloc[1],0:3] = [0,0, 255] #np.min([200 + curr_node.value_to_come*2, 255])
+    img[curr_node.iloc[0], curr_node.iloc[1],0:3] = [0,255, 255] #np.min([200 + curr_node.value_to_come*2, 255])
     # if ctr == 40:
     #     draw_vector(curr_node)
     #     ctr = 0
@@ -342,13 +352,13 @@ def add_image_frame(curr_node): # A function to add the newly explored state to 
 
 def solver(curr_node):  # A function to be recursively called to find the djikstra solution
     global a
-    counter = 0
-    while(counter < 2000):
-        counter +=1
+    # counter = 0
+    while(1):
+        # counter +=1
         #visitedNode.update({curr_node: "s"})
         a.map[curr_node.iloc[0],curr_node.iloc[1],int((curr_node.iloc[2]/angle_res))]=1 # --------->>>
-        print(curr_node.iloc[0], curr_node.iloc[1],int((curr_node.iloc[2]/angle_res)), "map check")
-        print(a.map[curr_node.iloc[0],curr_node.iloc[1],int((curr_node.iloc[2]/angle_res))], "map check")
+        # print("popped element", curr_node.loc[0], curr_node.loc[1],curr_node.loc[2])
+        # print(a.map[curr_node.iloc[0],curr_node.iloc[1],int((curr_node.iloc[2]/angle_res))], "map check")
         # print(a.map[30,40,0])
         # print(curr_node.value_to_come)
         global l
@@ -359,11 +369,13 @@ def solver(curr_node):  # A function to be recursively called to find the djikst
         children_list = find_children(curr_node) # a function to find possible children and update cost
         
         l = l + children_list                  # adding possible children to the list
-        # print(len(l))
+        # print(l)
         if (l == []):
             return 0
         heapq.heapify(l)                    # converting to a list
-        curr_node = heapq.heappop(l)[2]            # recursive call to solver where we pass the element with the least cost 
+        # print(l)
+        curr_node = l.pop(0)[2]            # recursive call to solver where we pass the element with the least cost 
+        # print("popped element - 0", curr_node.loc[0], curr_node.loc[1],curr_node.loc[2])
     return 1        
 
 
@@ -391,13 +403,15 @@ if __name__=="__main__":
     node_cnt = 0
     final_path = []
     visitedNode = {}
-    vidWriter = cv2.VideoWriter("Astar.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 24, (10*trsh,10*trsh)) # --->>>
+    vidWriter = cv2.VideoWriter("Astar_curve.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 24, (10*trsh,10*trsh)) # --->>>
     img = np.zeros([10*trsh,10*trsh,3], dtype=np.uint8)
     img[:,:,0:3] = [0,255,0]
+    nodes_file = open("nodes_optimal.txt", 'w')
+    nodes_file.write("X_Pos, Y_Pos, Theta, Action \n")
     # cv2.arrowedLine(img, (50, 50),(100, 100), (255, 144, 30), thickness = 5) 
     # cv2.imshow("try", img)
     # cv2.waitKey(0)
-    rpm1,rpm2,robot_r,clear_r,theta = 40,50,1,1,0
+    rpm1,rpm2,robot_r,clear_r,theta = 50,40,1,1,0
     #rpm1 = int(input("Enter RPM1 for the robot: "))
     #rpm2 = int(input("Enter RPM2 for the robot: "))
     #robot_r = int(input("Enter robot radius (to be harcoded from datasheet): ")) 
@@ -421,8 +435,8 @@ if __name__=="__main__":
     solve_problem_start = time.time()
     # visualize_map()
 
-    start_pt = [1.5,2]
-    end_pt = [5,2]
+    start_pt = [1,1]
+    end_pt = [3,9.5]
     valid_points = False
     while  valid_points == False:
         #start_pt = (input("Enter start point in form # #: "))
