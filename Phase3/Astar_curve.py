@@ -411,7 +411,7 @@ if __name__=="__main__":
     # cv2.arrowedLine(img, (50, 50),(100, 100), (255, 144, 30), thickness = 5) 
     # cv2.imshow("try", img)
     # cv2.waitKey(0)
-    rpm1,rpm2,robot_r,clear_r,theta = 50,40,1,1,0
+    rpm1,rpm2,robot_r,clear_r,theta = 50,40,18,2,0
     #rpm1 = int(input("Enter RPM1 for the robot: "))
     #rpm2 = int(input("Enter RPM2 for the robot: "))
     #robot_r = int(input("Enter robot radius (to be harcoded from datasheet): ")) 
@@ -435,8 +435,8 @@ if __name__=="__main__":
     solve_problem_start = time.time()
     # visualize_map()
 
-    start_pt = [1,1]
-    end_pt = [3,9.5]
+    start_pt = [1.5,2]
+    end_pt = [5,2]
     valid_points = False
     while  valid_points == False:
         #start_pt = (input("Enter start point in form # #: "))
