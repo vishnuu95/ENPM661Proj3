@@ -410,22 +410,19 @@ if __name__=="__main__":
     global angle_thrsh, angle_res
     global a
 
-    trsh = 20
+    trsh = 40
     #step_size = 1*trsh
     #theta = 30
     ctr = 0
     node_cnt = 0
     final_path = []
     visitedNode = {}
-    vidWriter = cv2.VideoWriter("Astar_curve.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 240, (int(round(10*trsh)),int(round(10*trsh)))) # --->>>
-    img = np.zeros([10*trsh,10*trsh,3], dtype=np.uint8)
+    vidWriter = cv2.VideoWriter("Astar_curve.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 240, (int(round(10.2*trsh)),int(round(10.2*trsh)))) # --->>>
+    img = np.zeros([int(10.2*trsh),int(10.2*trsh),3], dtype=np.uint8)
     img[:,:,0:3] = [0,255,0]
     nodes_file = open("nodes_optimal.txt", 'w')
-    nodes_file.write("X_Pos, Y_Pos, Theta, Action \n")
-    # cv2.arrowedLine(img, (50, 50),(100, 100), (255, 144, 30), thickness = 5) 
-    # cv2.imshow("try", img)
-    # cv2.waitKey(0)
-    rpm1,rpm2,robot_r,clear_r,theta = 40,50,1,1,0
+    # nodes_file.write("X_Pos, Y_Pos, Theta, Action \n")
+    rpm1,rpm2,robot_r,clear_r,theta = 40,50,int(35.4/2),2,0
     #rpm1 = int(input("Enter RPM1 for the robot: "))
     #rpm2 = int(input("Enter RPM2 for the robot: "))
     #robot_r = int(input("Enter robot radius (to be harcoded from datasheet): ")) 
