@@ -447,6 +447,8 @@ if __name__=="__main__":
     img[:,:,0:3] = [0,255,0]
     nodes_file = open("nodes_optimal.txt", 'w')
     # nodes_file.write("X_Pos, Y_Pos, Theta, Action \n")
+
+
     rpm1,rpm2,robot_r,clear_r,theta = 40,50,int(trsh * 0.354/2),int(trsh*0.2),0
     rpm1 = int(input("Enter RPM1 for the robot: "))
     rpm2 = int(input("Enter RPM2 for the robot: "))
@@ -470,6 +472,7 @@ if __name__=="__main__":
         start_pt = [float(start_pt.split()[0] ) + 5.1, float(start_pt.split()[1] ) + 5.1]
         theta = 0 
         start_pt = [int(trsh*start_pt[0]), int(trsh*start_pt[1]), theta ]
+        #print(start_pt)
         img[start_pt[0]][start_pt[1]][0:3] = [0,0,0]
 
         end_pt = input("Enter end point in form # # ( Range: -5.1 to 5.1): ")
