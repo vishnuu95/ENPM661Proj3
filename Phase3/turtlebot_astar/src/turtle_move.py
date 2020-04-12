@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
         rate = rospy.Rate(10)
         new_location = Twist()
-        fname = '/home/abhishek/Documents/nodes_optimal_part1.txt'
+        fname = './nodes_optimal.txt'
         f = open(fname,"r+")
         l = f.readlines()
         l_data = [line.rstrip() for line in l]

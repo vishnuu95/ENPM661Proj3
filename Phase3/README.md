@@ -11,7 +11,12 @@
 - ROS Kinetic
 - Gazebo
 ## Run the code
-- Clone this repository and navigate to Phase3 folder. 
+- Clone this repository and navigate to Phase3 folder.
+- Import the turtlebot_astar folder into the source folder of the existing catkin workspace and navigate to the workspace folder to enter command:
+```
+catkin_make
+```
+This will build the files for running the Gazebo Simulation. Navigate to  src/turtlebot_astar/src/ folder.
 - To run the A* algorithm for differential drive robot: 
 ```
 python3 Astar_curve.py
@@ -40,4 +45,12 @@ python3 Astar_curve.py
 <p align="center">
   <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/node_exploration.png">
 </p>
+
+## Run gazebo simulation
+- The Astar\_curve.py file generates a nodes\_optimal.txt file, which contains the final path nodes and RPMs
+- To run the simulation enter command:
+```
+roslaunch turtlebot_astar tastar.launch
+```
+- The simulation starts in Gazebo.
 
