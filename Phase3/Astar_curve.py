@@ -114,7 +114,7 @@ def max_and_min(point_list):
 def define_map(clear_r):
     global a
     global trsh
-    a = MapMake(10*trsh, 10*trsh)
+    a = MapMake(int(10.2*trsh), int(10.2*trsh))
     a.circle_obstacle(5*trsh, 5*trsh, 1*trsh)
     a.circle_obstacle(7*trsh, 8*trsh, 1*trsh)
     a.circle_obstacle(3*trsh, 2*trsh, 1*trsh)
@@ -410,7 +410,7 @@ if __name__=="__main__":
     global angle_thrsh, angle_res
     global a
 
-    trsh = 40
+    trsh = 20
     #step_size = 1*trsh
     #theta = 30
     ctr = 0
@@ -422,54 +422,44 @@ if __name__=="__main__":
     img[:,:,0:3] = [0,255,0]
     nodes_file = open("nodes_optimal.txt", 'w')
     # nodes_file.write("X_Pos, Y_Pos, Theta, Action \n")
-    rpm1,rpm2,robot_r,clear_r,theta = 40,50,int(35.4/2),2,0
-    #rpm1 = int(input("Enter RPM1 for the robot: "))
-    #rpm2 = int(input("Enter RPM2 for the robot: "))
-    #robot_r = int(input("Enter robot radius (to be harcoded from datasheet): ")) 
+    rpm1,rpm2,robot_r,clear_r,theta = 40,50,int(trsh * 0.354/2),int(trsh*0.2),0
+    rpm1 = int(input("Enter RPM1 for the robot: "))
+    rpm2 = int(input("Enter RPM2 for the robot: "))
     bot_r = 0.038
     bot_L = 0.354
     angle_thrsh = int(360/1)
     angle_res = 1
-    # angle_thrsh = int(360/angle_res)
-    print (angle_thrsh)
-    print ( angle_res)
-    #print(angle_thrsh)
-    #clear_r = int(input("Enter the clearance: "))
-    #step_size = int(input("Enter step size: "))
-    #step_size = step_size*trsh
-    #theta = int(input("Enter start orientation in degrees: "))
     total_clear = robot_r+clear_r
     define_map_start = time.time()
     define_map(total_clear)
     t1 = time.time()-define_map_start
     print("Time to define map: " + str(t1))
     solve_problem_start = time.time()
-    # visualize_map()
+    visualize_map()
 
-    start_pt = [1,2]
-    end_pt = [9,8]
+    # start_pt = [1,2]
+    # end_pt = [9,8]
     valid_points = False
     while  valid_points == False:
-        #start_pt = (input("Enter start point in form # #: "))
-        #start_pt = [int(start_pt.split()[0]), int(start_pt.split()[1])]
-        theta = 0
+        start_pt = input("Enter start point in form # # ( Range: -5.1 to 5.1) : ")
+        start_pt = [float(start_pt.split()[0] ) + 5.1, float(start_pt.split()[1] ) + 5.1]
+        theta = 0 
         start_pt = [int(trsh*start_pt[0]), int(trsh*start_pt[1]), theta ]
         img[start_pt[0]][start_pt[1]][0:3] = [0,0,0]
-        end_pt = [int(trsh*end_pt[0]), int(trsh*end_pt[1]), 0 ]
-        #end_pt = (input("Enter end point in form # # : "))
-        #end_pt = [trsh*int(end_pt.split()[0]), trsh*int(end_pt.split()[1]), 0]
-            # print (end_pt)
+
+        end_pt = input("Enter end point in form # # ( Range: -5.1 to 5.1): ")
+        end_pt = [float(end_pt.split()[0]) + 5.1, float(end_pt.split()[1]) + 5.1]
+        end_pt = [int(trsh*end_pt[0]), int(trsh*end_pt[1])]
         img[end_pt[0]][end_pt[1]][0:3] = [0,0,255]
+
         if(point_in_obstacle(start_pt) or point_in_obstacle(end_pt)): # check if either the start or end node an obstacle
             print("Enter valid points... ")
             continue
         else:
             valid_points = True
     
-    a.map[start_pt[0], start_pt[1], 1] = 0
-    print(start_pt)
-    print(end_pt)
-    # input()
+    a.map[start_pt[0], start_pt[1], 0] = 0
+
     # create start node belonging to class node
     start_node = node(start_pt,None, (0,0))
     start_node.value_to_come = 0
