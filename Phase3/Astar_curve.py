@@ -286,9 +286,11 @@ def find_path(curr_node): # A function to find the path until the root by tracki
         action  = curr.move
         if i !=0:
             nodes_file.write(str(prev_loc[0])+ "," + str(prev_loc[1]) + "," + str(prev_loc[2]) + "," + str(action) + "\n" )
+            x_intr , y_intr = find_pt(prev_loc[0], prev_loc[1], prev_loc[2], action[0], action[1], plot = True)
+            img[x_intr, y_intr, 0:3] = [255, 0, 0]
         prev_loc = curr.loc
         
-        for j in range(3):
+        for j in range(10):
             vidWriter.write(cv2.rotate(img,cv2.ROTATE_90_COUNTERCLOCKWISE))
     nodes_file.close()
     vidWriter.release()         
@@ -408,14 +410,14 @@ if __name__=="__main__":
     global angle_thrsh, angle_res
     global a
 
-    trsh = 100
+    trsh = 20
     #step_size = 1*trsh
     #theta = 30
     ctr = 0
     node_cnt = 0
     final_path = []
     visitedNode = {}
-    vidWriter = cv2.VideoWriter("Astar_curve.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 24, (int(round(10*trsh)),int(round(10*trsh)))) # --->>>
+    vidWriter = cv2.VideoWriter("Astar_curve.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 240, (int(round(10*trsh)),int(round(10*trsh)))) # --->>>
     img = np.zeros([10*trsh,10*trsh,3], dtype=np.uint8)
     img[:,:,0:3] = [0,255,0]
     nodes_file = open("nodes_optimal.txt", 'w')
@@ -423,7 +425,7 @@ if __name__=="__main__":
     # cv2.arrowedLine(img, (50, 50),(100, 100), (255, 144, 30), thickness = 5) 
     # cv2.imshow("try", img)
     # cv2.waitKey(0)
-    rpm1,rpm2,robot_r,clear_r,theta = 5,10,1,1,0
+    rpm1,rpm2,robot_r,clear_r,theta = 40,50,1,1,0
     #rpm1 = int(input("Enter RPM1 for the robot: "))
     #rpm2 = int(input("Enter RPM2 for the robot: "))
     #robot_r = int(input("Enter robot radius (to be harcoded from datasheet): ")) 
@@ -448,7 +450,7 @@ if __name__=="__main__":
     # visualize_map()
 
     start_pt = [1,2]
-    end_pt = [9,7.5]
+    end_pt = [9,8]
     valid_points = False
     while  valid_points == False:
         #start_pt = (input("Enter start point in form # #: "))
