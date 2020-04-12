@@ -25,4 +25,7 @@ python3 Astar_curve.py
 ### Sample output for (-4, -3) --> (0, 3)
 ![Path for (-4, -3) --> (0, 3)](Images/optimal_path2.png)
 ### Node exploration in High resolution
-![Node exploration](Images/node_exploration.png)
+<p align="center">
+  <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/node_exploration.png">
+</p>
+
