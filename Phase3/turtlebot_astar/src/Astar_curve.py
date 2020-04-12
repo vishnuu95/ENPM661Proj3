@@ -452,7 +452,7 @@ def main():
     # nodes_file.write("X_Pos, Y_Pos, Theta, Action \n")
 
 
-    rpm1,rpm2,robot_r,clear_r,theta = 40,50,int(trsh * 0.354/2),int(trsh*0.2),0
+    rpm1,rpm2,robot_r,clear_r,theta = 40,50,int(trsh * 0.354/2),int(trsh*0.26),0
     rpm1 = int(input("Enter RPM1 for the robot: "))
     rpm2 = int(input("Enter RPM2 for the robot: "))
     bot_r = 0.038

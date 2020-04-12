@@ -16,7 +16,7 @@ if __name__ == '__main__':
         rospy.init_node('turtle_move', anonymous=True)
 
         rate = rospy.Rate(10)
-        new_location = Twist()
+        vel_command = Twist()
         fname = './nodes_optimal.txt'
         f = open(fname,"r+")
         l = f.readlines()
@@ -36,12 +36,12 @@ if __name__ == '__main__':
 
         temp = np.asarray(temp) 
         for p in temp:
-            new_location.angular.z = np.deg2rad(p[1])/5
-            new_location.linear.x = p[0]/5
+            vel_command.angular.z = np.deg2rad(p[1])/5
+            vel_command.linear.x = p[0]/5
             
             for i in range(50):
-                rospy.loginfo(new_location)
-                pub.publish(new_location)
+                rospy.loginfo(vel_command)
+                pub.publish(vel_command)
                 rate.sleep()
 
 
