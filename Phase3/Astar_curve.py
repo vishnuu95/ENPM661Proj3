@@ -114,7 +114,7 @@ def max_and_min(point_list):
 def define_map(clear_r):
     global a
     global trsh
-    a = MapMake(10*trsh, 10*trsh)
+    a = MapMake(int(10.2*trsh), int(10.2*trsh))
     a.circle_obstacle(5*trsh, 5*trsh, 1*trsh)
     a.circle_obstacle(7*trsh, 8*trsh, 1*trsh)
     a.circle_obstacle(3*trsh, 2*trsh, 1*trsh)
@@ -410,7 +410,7 @@ if __name__=="__main__":
     global angle_thrsh, angle_res
     global a
 
-    trsh = 40
+    trsh = 20
     #step_size = 1*trsh
     #theta = 30
     ctr = 0
@@ -422,7 +422,7 @@ if __name__=="__main__":
     img[:,:,0:3] = [0,255,0]
     nodes_file = open("nodes_optimal.txt", 'w')
     # nodes_file.write("X_Pos, Y_Pos, Theta, Action \n")
-    rpm1,rpm2,robot_r,clear_r,theta = 40,50,int(35.4/2),2,0
+    rpm1,rpm2,robot_r,clear_r,theta = 40,50,int(trsh*(0.354/2)),int(trsh*0.2),0
     #rpm1 = int(input("Enter RPM1 for the robot: "))
     #rpm2 = int(input("Enter RPM2 for the robot: "))
     #robot_r = int(input("Enter robot radius (to be harcoded from datasheet): ")) 
@@ -454,6 +454,7 @@ if __name__=="__main__":
         #start_pt = [int(start_pt.split()[0]), int(start_pt.split()[1])]
         theta = 0
         start_pt = [int(trsh*start_pt[0]), int(trsh*start_pt[1]), theta ]
+        #print(start_pt)
         img[start_pt[0]][start_pt[1]][0:3] = [0,0,0]
         end_pt = [int(trsh*end_pt[0]), int(trsh*end_pt[1]), 0 ]
         #end_pt = (input("Enter end point in form # # : "))
