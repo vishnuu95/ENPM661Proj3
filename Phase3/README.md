@@ -20,14 +20,17 @@ python3 Astar_curve.py
 <p align="center">
   <img width="900" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/options.png">
 </p>
+
 ### Configuration Space
 <p align="center">
   <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/raw_img.png">
 </p>
+
 ### Sample output for (-4, -3) --> (4, 3)
 <p align="center">
   <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/optimal_path.png">
 </p>
+
 ### Sample output for (-4, -3) --> (0, 3)
 <p align="center">
   <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/optimal_path2.png">
