@@ -28,7 +28,7 @@ class node:
 
 
 class MapMake:
-
+    global img
     def __init__(self, width_x, length_y):
         global angle_thrsh
         self.width_x = width_x
@@ -301,7 +301,7 @@ def is_goal(curr_node):              # checks if the current node is also the go
 
 def find_path(curr_node): # A function to find the path until the root by tracking each node's parent
 
-    global final_path
+    global final_path, nodes_file
     while(curr_node!=None):
         final_path.insert(0, curr_node)
         curr_node = curr_node.parent
@@ -437,6 +437,8 @@ def main():
     global bot_r, bot_L
     global angle_thrsh, angle_res
     global a
+    global img
+    global nodes_file
 
     trsh = 20
     #step_size = 1*trsh
