@@ -16,7 +16,7 @@
 ```
 python3 Astar_curve.py
 ```
-- The following options should be visible: 
+### Options visible
 ![Options](Images/options.png)
 ### Configuration Space
 ![Configuration space ](Images/raw_img.png)
@@ -24,3 +24,5 @@ python3 Astar_curve.py
 ![Path for (-4, -3) --> (4, 3)](Images/optimal_path.png)
 ### Sample output for (-4, -3) --> (0, 3)
 ![Path for (-4, -3) --> (0, 3)](Images/optimal_path2.png)
+### Node exploration in High resolution
+![Node exploration](Images/node_exploration.png)
