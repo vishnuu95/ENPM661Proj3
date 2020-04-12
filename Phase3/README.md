@@ -17,13 +17,22 @@
 python3 Astar_curve.py
 ```
 ### Options visible
-![Options](Images/options.png)
+<p align="center">
+  <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/options.png">
+</p>
 ### Configuration Space
-![Configuration space ](Images/raw_img.png)
+<p align="center">
+  <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/raw_img.png">
+</p>
 ### Sample output for (-4, -3) --> (4, 3)
-![Path for (-4, -3) --> (4, 3)](Images/optimal_path.png)
+<p align="center">
+  <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/optimal_path.png">
+</p>
 ### Sample output for (-4, -3) --> (0, 3)
-![Path for (-4, -3) --> (0, 3)](Images/optimal_path2.png)
+<p align="center">
+  <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/optimal_path2.png">
+</p>
+
 ### Node exploration in High resolution
 <p align="center">
   <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/node_exploration.png">
