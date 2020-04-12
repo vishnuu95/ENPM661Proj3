@@ -435,7 +435,7 @@ if __name__=="__main__":
     t1 = time.time()-define_map_start
     print("Time to define map: " + str(t1))
     solve_problem_start = time.time()
-    visualize_map()
+    # visualize_map()
 
     # start_pt = [1,2]
     # end_pt = [9,8]
