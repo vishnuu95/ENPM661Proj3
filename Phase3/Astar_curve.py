@@ -163,7 +163,7 @@ def threshold(angle):
         angle = angle - angle%angle_res                   
     return angle         
 
-def find_pt(x, y, th, Lrpm, Rrpm, plot = False):
+def find_pt(x, y, th, Lrpm, Rrpm, plot = False, write = False):
     global bot_r, bot_L,trsh
     # **********
     t = 1
@@ -174,30 +174,53 @@ def find_pt(x, y, th, Lrpm, Rrpm, plot = False):
     move = []
     x_moves = []
     y_moves = []
+    x_amoves = []
+    y_amoves = []
+    theta_amoves = []
     cost = 0
     Lrpm = (Lrpm*2*np.pi)/60
     Rrpm = (Rrpm*2*np.pi)/60
-    while(t>0):
-        x_ += trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.cos(np.deg2rad(th_)) * 0.1)
-        y_ += trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.sin(np.deg2rad(th_)) * 0.1)
-        th_ += (180/np.pi)*((bot_r/bot_L) * (Rrpm - Lrpm) * 0.1)
-        t -= 0.1
-        x_moves.append(int(round(x_)))
-        y_moves.append(int(round(y_)))
 
-    amove += [(x_)]
-    amove += [(y_)]
-    amove += [(check_round(th_))] # ------->>>>>>>>>>
-    
-    move += [int(round(x_))]
-    move += [int(round(y_))]
-    move += [threshold(check_round(th_))]
-    # print (amove, move)
-    # input()
-    # print (amove)
-    if plot == True:
+
+    if plot == True and write == True:
+        while(t>0):
+            x_ += trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.cos(np.deg2rad(th_)) * 0.1)
+            y_ += trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.sin(np.deg2rad(th_)) * 0.1)
+            th_ += (180/np.pi)*((bot_r/bot_L) * (Rrpm - Lrpm) * 0.1)
+            t -= 0.1
+            x_moves.append(int(round(x_)))
+            y_moves.append(int(round(y_)))
+            x_amoves.append(x_)
+            y_amoves.append(y_)
+            theta_amoves.append(threshold(check_round(th_)))
+        return x_moves, y_moves, x_amoves, y_amoves, theta_amoves
+    elif plot == True:        
+        while(t>0):
+            x_ += trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.cos(np.deg2rad(th_)) * 0.1)
+            y_ += trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.sin(np.deg2rad(th_)) * 0.1)
+            th_ += (180/np.pi)*((bot_r/bot_L) * (Rrpm - Lrpm) * 0.1)
+            t -= 0.1
+            x_moves.append(int(round(x_)))
+            y_moves.append(int(round(y_)))
         return x_moves, y_moves
-    return amove,move#,cost         
+    else:
+        while(t>0):
+            x_ += trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.cos(np.deg2rad(th_)) * 0.1)
+            y_ += trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.sin(np.deg2rad(th_)) * 0.1)
+            th_ += (180/np.pi)*((bot_r/bot_L) * (Rrpm - Lrpm) * 0.1)
+            t -= 0.1
+            x_moves.append(int(round(x_)))
+            y_moves.append(int(round(y_))) 
+        amove += [(x_)]
+        amove += [(y_)]
+        amove += [(check_round(th_))] # ------->>>>>>>>>>
+    
+        move += [int(round(x_))]
+        move += [int(round(y_))]
+        move += [threshold(check_round(th_))]
+        # print (amove, move)
+        # input()
+        return amove,move#,cost         
 
 def allowable_check(point):
     global a,rpm1, rpm2, angle_thrsh, angle_res
@@ -285,8 +308,10 @@ def find_path(curr_node): # A function to find the path until the root by tracki
         curr = value
         action  = curr.move
         if i !=0:
-            nodes_file.write(str(prev_loc[0])+ "," + str(prev_loc[1]) + "," + str(prev_loc[2]) + "," + str(action) + "\n" )
-            x_intr , y_intr = find_pt(prev_loc[0], prev_loc[1], prev_loc[2], action[0], action[1], plot = True)
+            x_intr , y_intr, x_act, y_act, th_act = find_pt(prev_loc[0], prev_loc[1], prev_loc[2], action[0], action[1], plot = True, write = True)
+            for x, y, th in zip(x_act, y_act, th_act):
+                nodes_file.write(str(x)+ "," + str(y) + "," + str(th) + "," + str(action) + "\n" )
+
             img[x_intr, y_intr, 0:3] = [255, 0, 0]
         prev_loc = curr.loc
         
