@@ -163,7 +163,7 @@ def threshold(angle):
         angle = angle - angle%angle_res                   
     return angle         
 
-def find_pt(x, y, th, Lrpm, Rrpm):
+def find_pt(x, y, th, Lrpm, Rrpm, plot = False):
     global bot_r, bot_L,trsh
     # **********
     t = 1
@@ -172,6 +172,8 @@ def find_pt(x, y, th, Lrpm, Rrpm):
     th_ = th
     amove = []
     move = []
+    x_moves = []
+    y_moves = []
     cost = 0
     Lrpm = (Lrpm*2*np.pi)/60
     Rrpm = (Rrpm*2*np.pi)/60
@@ -180,11 +182,9 @@ def find_pt(x, y, th, Lrpm, Rrpm):
         y_ += trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.sin(np.deg2rad(th_)) * 0.1)
         th_ += (180/np.pi)*((bot_r/bot_L) * (Rrpm - Lrpm) * 0.1)
         t -= 0.1
-        # cost += np.sqrt((trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.cos(np.deg2rad(th_)) * 0.1))**2 + (trsh*(0.5 * bot_r * ( Lrpm + Rrpm) * np.sin(np.deg2rad(th_)) * 0.1))**2)
+        x_moves.append(int(round(x_)))
+        y_moves.append(int(round(y_)))
 
-    # print(x - x_)
-    # print(y - y_)    
-    # input()
     amove += [(x_)]
     amove += [(y_)]
     amove += [(check_round(th_))] # ------->>>>>>>>>>
@@ -195,6 +195,8 @@ def find_pt(x, y, th, Lrpm, Rrpm):
     # print (amove, move)
     # input()
     # print (amove)
+    if plot == True:
+        return x_moves, y_moves
     return amove,move#,cost         
 
 def allowable_check(point):
@@ -305,7 +307,7 @@ def find_children(curr_node):
     for idx, state_loc in zip(ids, child_loc):
         #print(state_loc,curr_node.loc)
         go_cost = math.sqrt((state_loc[0]-end_pt[0])**2 + (state_loc[1]-end_pt[1])**2)
-        child_cost_to_come = math.sqrt((state_loc[0]-curr_node.loc[0])**2 + (state_loc[1]-curr_node.loc[1])**2)
+        child_cost_to_come = curr_node.value_to_come + math.sqrt((state_loc[0]-curr_node.loc[0])**2 + (state_loc[1]-curr_node.loc[1])**2)
         # child_cost_to_come = state_cost
         # print(i, a.map[int(state_loc[0])][int(state_loc[1])][angle_thrsh+2] + a.map[int(state_loc[0])][int(state_loc[1])][angle_thrsh+3])
         # print( i, state_loc[0], state_loc[1], child_cost_to_come, go_cost )
@@ -318,6 +320,7 @@ def find_children(curr_node):
             # print(which_move(idx))
             # input()
             child_node = node(state_loc,curr_node, which_move(idx))              # create new child node
+            add_image_frame(child_node, curve = True)
             # print("a*", child_node.value_to_come ,child_node.value_to_go, state_loc[0], state_loc[1], state_loc[2])
             children_list.append((child_node.value_to_come + child_node.value_to_go, child_node.counter, child_node))
     # print(len(children_list))
@@ -337,9 +340,17 @@ def which_move(idx):
     }
     return moves[idx]
 
-def add_image_frame(curr_node): # A function to add the newly explored state to a frame. This would also update the color based on the cost to come
+def add_image_frame(curr_node, curve = False): # A function to add the newly explored state to a frame. This would also update the color based on the cost to come
     global img, vidWriter, ctr
-    img[curr_node.iloc[0], curr_node.iloc[1],0:3] = [0,255, 255] #np.min([200 + curr_node.value_to_come*2, 255])
+    if curve == True:
+        node = curr_node.parent
+        x_intr, y_intr = find_pt(node.loc[0], node.loc[1], node.loc[2], curr_node.move[0], curr_node.move[1], plot = True)
+        # print(x_intr, y_intr)
+        img[x_intr, y_intr, 0:3] = [0, 255, np.min([100 + curr_node.value_to_come*2, 255])]
+
+    elif curve == False:
+        img[curr_node.iloc[0], curr_node.iloc[1],0:3] = [0,255, np.min([100 + curr_node.value_to_come*2, 255])] #np.min([200 + curr_node.value_to_come*2, 255])
+
     # if ctr == 40:
     #     draw_vector(curr_node)
     #     ctr = 0
@@ -363,6 +374,7 @@ def solver(curr_node):  # A function to be recursively called to find the djikst
         # print(curr_node.value_to_come)
         global l
         if (is_goal(curr_node)):
+            print("Path found, Plotting optimal path.") 
             find_path(curr_node) # find the path to the start node by tracking the node's parent
             break
         add_image_frame(curr_node)
@@ -403,7 +415,7 @@ if __name__=="__main__":
     node_cnt = 0
     final_path = []
     visitedNode = {}
-    vidWriter = cv2.VideoWriter("Astar_curve.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 24, (10*trsh,10*trsh)) # --->>>
+    vidWriter = cv2.VideoWriter("Astar_curve.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 24, (int(round(10*trsh)),int(round(10*trsh)))) # --->>>
     img = np.zeros([10*trsh,10*trsh,3], dtype=np.uint8)
     img[:,:,0:3] = [0,255,0]
     nodes_file = open("nodes_optimal.txt", 'w')
@@ -411,7 +423,7 @@ if __name__=="__main__":
     # cv2.arrowedLine(img, (50, 50),(100, 100), (255, 144, 30), thickness = 5) 
     # cv2.imshow("try", img)
     # cv2.waitKey(0)
-    rpm1,rpm2,robot_r,clear_r,theta = 50,40,18,2,0
+    rpm1,rpm2,robot_r,clear_r,theta = 5,10,1,1,0
     #rpm1 = int(input("Enter RPM1 for the robot: "))
     #rpm2 = int(input("Enter RPM2 for the robot: "))
     #robot_r = int(input("Enter robot radius (to be harcoded from datasheet): ")) 
@@ -435,8 +447,8 @@ if __name__=="__main__":
     solve_problem_start = time.time()
     # visualize_map()
 
-    start_pt = [1.5,2]
-    end_pt = [5,2]
+    start_pt = [1,2]
+    end_pt = [9,7.5]
     valid_points = False
     while  valid_points == False:
         #start_pt = (input("Enter start point in form # #: "))
@@ -475,7 +487,7 @@ if __name__=="__main__":
     # print(flag)
     # if found, visualise the path 
     if flag == 1:
-        print("Path found. Please watch the video generated.")
+        print("Please watch the video generated.")
         print("Time to define map and solve problem: " + str(time.time() - solve_problem_start + t1))
     # else print path not found    
     else:
