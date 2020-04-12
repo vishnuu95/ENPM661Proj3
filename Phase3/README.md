@@ -50,7 +50,7 @@ python3 Astar_curve.py
 - The Astar\_curve.py file generates a nodes\_optimal.txt file, which contains the final path nodes and RPMs
 - To run the simulation enter command:
 ```
-roslaunch turtlebot_astar tastar.launch
+roslaunch turtlebot_astar tastar.launch X:=<x-coordinate-in-gazebo-coordinates> Y:=<y-coordinate-in-gazebo-coordinates> T:=<theta-in-radians>
 ```
-- The simulation starts in Gazebo.
+- The simulation starts in Gazebo. The X and Y values are in Gazebo environment coordinate,i.e., with the origin(0,0) at the geometric center of the world. Default values are set to X = -4, Y = -3 and T = 0, andthe simulations have been run with these coordinates.
 
