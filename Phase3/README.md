@@ -17,9 +17,10 @@
 python3 Astar_curve.py
 ```
 - The following options should be visible: 
-
-
-![Options](https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/options.png)User Options
-![Configuration space ](https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/raw_img.png )Configuration Space
-![Path for (-4, -3) --> (4, 3)](https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/optimal_path.png)Sample Optimal Path : (-4, -3) --> (4, 3)
-![Path for (-4, -3) --> (0, 3)](https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/optimal_path2.png)Sample Optimal Path 2 : (-4, -3) --> (0, 3)
+![Options](Images/options.png)
+### Configuration Space
+![Configuration space ](Images/raw_img.png)
+### Sample output for (-4, -3) --> (4, 3)
+![Path for (-4, -3) --> (4, 3)](Images/optimal_path.png)
+### Sample output for (-4, -3) --> (0, 3)
+![Path for (-4, -3) --> (0, 3)](Images/optimal_path2.png)
