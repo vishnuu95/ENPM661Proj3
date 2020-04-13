@@ -473,10 +473,10 @@ def main():
     # end_pt = [9,8]
     valid_points = False
     while  valid_points == False:
-        start_pt = input("Enter start point in form # # ( Range: -5.1 to 5.1) : ")
-        start_pt = [float(start_pt.split()[0] ) + 5.1, float(start_pt.split()[1] ) + 5.1]
-        theta = 0 
-        start_pt = [int(trsh*start_pt[0]), int(trsh*start_pt[1]), theta ]
+        start_pt = input("Enter start point in form # # # ( Range: -5.1 to 5.1) : ")
+        start_pt = [float(start_pt.split()[0] ) + 5.1, float(start_pt.split()[1] ) + 5.1, check_round(int(start_pt.split()[2]))]
+        
+        start_pt = [int(trsh*start_pt[0]), int(trsh*start_pt[1]), start_pt[2]]
         #print(start_pt)
         img[start_pt[0]][start_pt[1]][0:3] = [0,0,0]
 
