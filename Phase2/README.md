@@ -1,12 +1,12 @@
-# Dijkstra - Project 2, ENPM661.
+# A* algorithm for Point and Rigid robot with Holonomic constraints, ENPM661.
  
-The project was created towards completion of Project 2 as part of ENPM661- Planning for Autonomous Robots at University of Maryland, College park
+The project was created towards completion of Project 3 as part of ENPM661- Planning for Autonomous Robots at University of Maryland, College park
 
 The obstacles were defined as per shown in the problem statement. 
 
 The Project contains 2 files
-* Dijkstra_point.py
-* Dijkstra_rigid.py
+* Astar_point.py
+* Astar_rigid.py
 
 ## Dependencies to run the code. 
 
@@ -22,14 +22,14 @@ The Project contains 2 files
 ```
 For point robot, run
 ```
-* python3 Dijkstra_point.py # for point robot
+* python3 Astar_point.py # for point robot
 ```
 A user input of x and y is expected for input and goal point in Cartesian coordinates. 
 
 
 For rigid robot, run
 ```
-* python3 Dijkstra_rigid.py # for rigid robot
+* python3 Astar_rigid.py # for rigid robot
 ```
 In addition to the start point and goal point, user is expected to input robot radius and clearance. 
 
