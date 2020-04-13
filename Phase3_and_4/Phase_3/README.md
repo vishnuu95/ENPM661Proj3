@@ -18,7 +18,7 @@ python3 Astar_curve.py
 ```
 ### Options visible
 <p align="center">
-  <img width="900" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/options.png">
+  <img width="900" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3_and_4/Images/options.png">
 </p>
 
 ### Configuration Space
