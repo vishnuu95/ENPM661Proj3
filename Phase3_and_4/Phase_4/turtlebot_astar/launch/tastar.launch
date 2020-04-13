@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+  <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find turtlebot_astar)/world/map_astar.world"/>
+    <!-- more default parameters can be changed here -->
+  </include>
+	
+
+  <arg name="X" default="-4.0"/>
+  <arg name="Y" default="-3.0"/>
+  <arg name="T" default="0.0"/>
+  <arg name="base" value="$(optenv TURTLEBOT_BASE kobuki)"/>
+  <arg name="stacks" value="$(optenv TURTLEBOT_STACKS hexagons)"/> 
+  <arg name="3d_sensor" value="$(optenv TURTLEBOT_3D_SENSOR kinect)"/>
+  <include file="$(find turtlebot_astar)/launch//includes/Turtlebot_Kinect.launch.xml">
+    <arg name="init_pose" value="-x $(arg X) -y $(arg Y) -z 0.0 -R 0.0 -P 0.0 -Y $(arg T)"/>
+    <arg name="base" value="$(arg base)"/>
+    <arg name="stacks" value="$(arg stacks)"/>
+    <arg name="3d_sensor" value="$(arg 3d_sensor)"/>
+  </include>
+
+  <node
+    pkg="turtlebot_astar"
+    type="turtle_move.py"
+    name="turtle_move"
+    output="screen"
+   />
+</launch>
