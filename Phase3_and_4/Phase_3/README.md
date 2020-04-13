@@ -23,21 +23,21 @@ python3 Astar_curve.py
 
 ### Configuration Space
 <p align="center">
-  <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/raw_img.png">
+  <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3_and_4/Images/raw_img.png">
 </p>
 
 ### Sample output for (-4, -3) --> (4, 3)
 <p align="center">
-  <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/optimal_path.png">
+  <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3_and_4/Images/optimal_path.png">
 </p>
 
 ### Sample output for (-4, -3) --> (0, 3)
 <p align="center">
-  <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/optimal_path2.png">
+  <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3_and_4/Images/optimal_path2.png">
 </p>
 
 ### Node exploration in High resolution
 <p align="center">
-  <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3/Images/node_exploration.png">
+  <img width="460" height="300" src="https://github.com/vishnuu95/ENPM661Proj3/blob/master/Phase3_and_4/Images/node_exploration.png">
 </p>
 
